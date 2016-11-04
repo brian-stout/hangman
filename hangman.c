@@ -6,6 +6,7 @@
 #include <string.h>
 #include <sysexits.h>
 #include <time.h>
+#include <stdbool.h>
 
 struct savestate{
 
@@ -63,7 +64,7 @@ int main(void)
 	strncat(hangman_directory, "/.hangman", sizeof(hangman_directory));
 	strncat(words_directory, "/.words", sizeof(words_directory));
 
-/*
+
 	//Reads the .hangman save file if it exists, if it doesn't initializes it
 	FILE *save_file = fopen(hangman_directory, "r");
 	if(!save_file){
@@ -86,9 +87,6 @@ int main(void)
 	read_savefile(save_file, &savestate);
 	printf("%d\n", savestate.losses);
 
-	fclose(save_file);
-*/
-	
 	//Opens up the dictionary in the directory, errors out if it's not there
 	FILE *dictionary = fopen(words_directory, "r");
 	if(!dictionary){
@@ -140,8 +138,6 @@ int main(void)
 		}
 	}
 	printf("DEBUG: %s\n", word);
-	fclose(dictionary);
-
 
 	char letter_guess;
 
@@ -161,16 +157,18 @@ int main(void)
 	char *temp_word = (char *) malloc(strlen(word));
 	int guess_count = 0;
 
-	while(1){
+	while(true){
 
 		//Breaks out of loop if player wins
 		if(current_mask == win_mask){
 			printf("You win!\n");
+			++savestate.wins;
 			break;
 		}
 		//Breaks out of a loop if player makes 6 bad guesses, aka a loss
 		if(guess_count == 6){
 			printf("You lose!\n");
+			++savestate.losses;
 			break;
 		}
 		
@@ -201,11 +199,13 @@ int main(void)
 		printf("%s\n", temp_word);
 	}
 
-	
+	printf("%d \n %d\n", savestate.wins, savestate.losses);
 	
 	//making sure to free line because it was malloc'd
 	free(word);
 	free(temp_word);
+	fclose(dictionary);
+	fclose(save_file);
 	
 
 	//TODO: Get a char from the user and run it through the character_matcher
@@ -249,7 +249,7 @@ void get_letter(char *chr)
 {
 	fgets(chr, sizeof(chr), stdin);
 }
-/*
+
 void read_savefile(FILE *savefile, struct savestate *savestate)
 {
 		char savebuf[16];
@@ -266,4 +266,4 @@ void read_savefile(FILE *savefile, struct savestate *savestate)
 		savestate->losing_streak = strtol(savebuf, NULL, 10);
 
 }
-*/
+
