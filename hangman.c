@@ -147,7 +147,7 @@ while(true){
 	win_mask -= 1;
 
 	//Defines what a miss is.  A character_matcher result including punctuation
-	unsigned int miss_mask = character_matcher(word, '\0');
+	unsigned int miss_mask = character_matcher(word, '1');
 
 	//Intializes values to be used in the loop later
 	unsigned int current_mask = 0;
@@ -194,7 +194,7 @@ while(true){
 
 	//Creating a temporary array for word so function doesn't modify the original word
 		strncpy(temp_word, word, strlen(word));
-		result_printer(temp_word, current_mask);
+		result_printer(temp_word, current_mask, strlen(temp_word));
 
 		printf("%s\n", temp_word);
 		wipe_string(temp_word, strlen(temp_word));
@@ -230,7 +230,7 @@ while(true){
 int character_matcher(char string[], char chr)
 {
 	unsigned int mask = 0;
-	char alt_chr;
+	char alt_chr = '\0';
 	if(isupper(chr)){
 		alt_chr = tolower(chr);
 	}
@@ -247,10 +247,10 @@ int character_matcher(char string[], char chr)
 	return mask;
 }
 
-void result_printer(char *string, int bitmask)
+void result_printer(char *string, int bitmask, size_t len)
 {
 	//Starting at end to match the bitmask
-	for(int i = strlen(string) - 1; i >= 0; --i){
+	for(int i = len - 1; i >= 0; --i){
 		if((bitmask & 1) != 1){
 			string[i] = '_';
 		}
