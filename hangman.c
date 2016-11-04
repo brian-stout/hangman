@@ -16,6 +16,7 @@ struct savestate{
 	int miss_amount;
 	int winning_streak;
 	int losing_streak;
+	int misses;
 };
 
 
@@ -27,10 +28,10 @@ struct savestate{
 *		If function return a zero, the player had a miss
 *		If function returns a full bit mask, the player wins.
 */
-int character_matcher(char *, char);
+int character_matcher(char *, char, size_t);
 
 
-/** A function that passes a string and a bit mask
+/**	A function that passes a string and a bit mask
 *		The function iterates through each character of a string and
 *		if the bit in the mask is set to 1, will print out that character,
 *		else it'll print out an underscore unless it's a nonalphabet character
@@ -40,16 +41,31 @@ int character_matcher(char *, char);
 void result_printer(char *, int, size_t);
 
 
-
+/**	get_letter function is responsible for receiving user input
+*		as well as error handling user input
+*/
 void get_letter(char *);
 
-
+/** read_savefile function reads the savefile ".hangman" that the
+*		program generates, parses that information and passes it to
+*		the savestate struct which keeps track of all the user stat
+*		while user runs the program
+*/
 void read_savefile(FILE *, struct savestate *);
 
-
+/** write_savefile function takes the savestate struct before the program
+*		terminates and writes it to .hangman in the 
+*
+*
+*/
 void write_savefile(FILE *, struct savestate);
 
-
+/** simple function that takes in a pointer to a string and fills it with
+*		null bytes.  The purpose is to wipe buffers at the end of a playthrough
+*		to improve program stability when running multiple times.
+*
+*
+*/
 void wipe_string(char *, size_t);
 
 
@@ -72,6 +88,7 @@ int main(void)
 	strncat(words_directory, "/.words", sizeof(words_directory));
 
 	while(true){
+
 		//Reads the .hangman save file if it exists, if it doesn't initializes it
 		FILE *save_file = fopen(hangman_directory, "r");
 		if(!save_file){
@@ -80,7 +97,7 @@ int main(void)
 				perror("Can not create .hangman!");
 				return EX_CANTCREAT;
 			}
-			fprintf(save_file, "0\n0\n0\n0\n");
+			fprintf(save_file, "0\n0\n0\n0\n0\n");
 	
 			fclose(save_file);
 	
@@ -144,18 +161,21 @@ int main(void)
 				break;
 			}
 		}
-		size_t len = strlen(word);
+
+		//Calculate strlen here because it's used a million times in this function
+		size_t word_len = strlen(word);
 		printf("DEBUG: %s\n", word);
 
 		char letter_guess;
 
 		//Generates a number that is used to compare to a full mask aka a win
 		unsigned int win_mask = 1;
-		win_mask <<= len;
+		win_mask <<= word_len;
 		win_mask -= 1;
 
-		//Defines what a miss is.  A character_matcher result including punctuation
-		unsigned int miss_mask = character_matcher(word, '\0');
+		//Defines what a miss is.
+		//An empty character_matcher result plus punctuation
+		unsigned int miss_mask = character_matcher(word, '\0', word_len);
 	
 		//Intializes values to be used in the loop later
 		unsigned int current_mask = 0;
@@ -188,31 +208,32 @@ int main(void)
 			//Captures a result mask and ors it with the current mask
 
 			//Figures out how many characters are in the word and returns the resulting mask
-			result_mask = character_matcher(word, letter_guess);
+			result_mask = character_matcher(word, letter_guess, word_len);
 	
 			//Checks for a bad guess
 			if(result_mask == miss_mask){
 				printf("Bad guess!\n");
 				++guess_count;
+				++savestate.misses;
 			}
 
 			//Or's the current mask so program can keep track of player progress
 			current_mask |= result_mask;
 
 			//Creating a temporary array for word so function doesn't modify the original word
-			strncpy(temp_word, word, len);
+			strncpy(temp_word, word, word_len);
 
-			result_printer(temp_word, current_mask, len);
+			result_printer(temp_word, current_mask, word_len);
 			printf("%s\n", temp_word);
 
-			wipe_string(temp_word, len);
+			wipe_string(temp_word, word_len);
 		}
 
 		//Wipes out buffers and masks to make rerunning the program more reliable
 		result_mask = 0;
 		win_mask = 0;
 		current_mask = 0;
-		len = 0;
+		word_len = 0;
 
 		fclose(dictionary);
 		fclose(save_file);
@@ -229,7 +250,7 @@ int main(void)
 }
 
 
-int character_matcher(char string[], char chr)
+int character_matcher(char string[], char chr, size_t word_len)
 {
 	unsigned int mask = 0;
 	char alt_chr = '\0';
@@ -239,7 +260,7 @@ int character_matcher(char string[], char chr)
 	else if (islower(chr)){
 		alt_chr = toupper(chr);
 	}
-	for(size_t i = 0; i < strlen(string); ++i){
+	for(size_t i = 0; i < word_len; ++i){
 		if(string[i] == chr || string[i] == alt_chr || isalpha(string[i]) == 0){
 			mask |= 1;
 		} 
@@ -269,6 +290,7 @@ void get_letter(char *chr)
 void read_savefile(FILE *savefile, struct savestate *savestate)
 {
 		char savebuf[16];
+
 		fgets(savebuf, sizeof(savebuf), savefile);
 		savestate->wins = strtol(savebuf, NULL, 10);
 
@@ -281,6 +303,9 @@ void read_savefile(FILE *savefile, struct savestate *savestate)
 		fgets(savebuf, sizeof(savebuf), savefile);
 		savestate->losing_streak = strtol(savebuf, NULL, 10);
 
+		fgets(savebuf, sizeof(savebuf), savefile);
+		savestate->misses = strtol(savebuf, NULL, 10);
+
 }
 
 void write_savefile(FILE *savefile, struct savestate savestate)
@@ -289,6 +314,7 @@ void write_savefile(FILE *savefile, struct savestate savestate)
 	fprintf(savefile, "%d\n", savestate.losses);
 	fprintf(savefile, "%d\n", savestate.winning_streak);
 	fprintf(savefile, "%d\n", savestate.losing_streak);
+	fprintf(savefile, "%d\n", savestate.misses);
 
 }
 
