@@ -7,6 +7,7 @@
 #include <time.h>
 #include <stdbool.h>
 
+
 struct savestate{
 
 	//Variables for the save state
@@ -17,34 +18,40 @@ struct savestate{
 	int losing_streak;
 };
 
-/* A function that passes a string and a character
-	The function iterates through each character of the string, and if
-	the characters match up, it sets the flag to 1 and returns a bit mask
-	for all the places it was correct.
 
-	If function return a zero, the player had a miss
-	If function returns a full bit mask, the player wins.
+/**	A function that passes a string and a character
+*		The function iterates through each character of the string, and if
+*		the characters match up, it sets the flag to 1 and returns a bit mask
+*		for all the places it was correct.
+*
+*		If function return a zero, the player had a miss
+*		If function returns a full bit mask, the player wins.
 */
 int character_matcher(char *, char);
 
 
-/*  A function that passes a string and a bit mask
-	The function iterates through each character of a string and
-	if the bit in the mask is set to 1, will print out that character,
-	else it'll print out an underscore unless it's a nonalphabet character
-
-	TODO: Write logic to test for unicode and handle it properly
-
+/** A function that passes a string and a bit mask
+*		The function iterates through each character of a string and
+*		if the bit in the mask is set to 1, will print out that character,
+*		else it'll print out an underscore unless it's a nonalphabet character
+*
+*		TODO: Write logic to test for unicode and handle it properly
 */
 void result_printer(char *, int, size_t);
 
+
+
 void get_letter(char *);
+
 
 void read_savefile(FILE *, struct savestate *);
 
+
 void write_savefile(FILE *, struct savestate);
 
+
 void wipe_string(char *, size_t);
+
 
 int main(void)
 {
@@ -144,7 +151,7 @@ int main(void)
 
 		//Generates a number that is used to compare to a full mask aka a win
 		unsigned int win_mask = 1;
-		win_mask <<= strlen(word);
+		win_mask <<= len;
 		win_mask -= 1;
 
 		//Defines what a miss is.  A character_matcher result including punctuation
@@ -193,7 +200,7 @@ int main(void)
 			current_mask |= result_mask;
 
 			//Creating a temporary array for word so function doesn't modify the original word
-			strncpy(temp_word, word, strlen(word));
+			strncpy(temp_word, word, len);
 
 			result_printer(temp_word, current_mask, len);
 			printf("%s\n", temp_word);
@@ -205,6 +212,7 @@ int main(void)
 		result_mask = 0;
 		win_mask = 0;
 		current_mask = 0;
+		len = 0;
 
 		fclose(dictionary);
 		fclose(save_file);
