@@ -77,7 +77,7 @@ int main(void)
 
 		save_file = fopen(hangman_directory, "r");
 		if(!save_file){
-			perror("Can not write to .hangman file!");
+			perror("Can not open the .hangman file!");
 			return EX_NOINPUT;
 		}
 	}
@@ -203,9 +203,10 @@ int main(void)
 	free(temp_word);
 	fclose(dictionary);
 	fclose(save_file);
+
+	save_file = FOPEN
 	
 
-	//TODO: Get a char from the user and run it through the character_matcher
 	//TODO: add char to a list of guessed characters
 	//TODO: chastize user if he guesses a character already guessed
 }
