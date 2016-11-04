@@ -37,7 +37,7 @@ int character_matcher(char *, char);
 	TODO: Write logic to test for unicode and handle it properly
 
 */
-void result_printer(char *, int);
+void result_printer(char *, int, size_t);
 
 void get_letter(char *);
 
@@ -65,165 +65,168 @@ int main(void)
 	strncat(hangman_directory, "/.hangman", sizeof(hangman_directory));
 	strncat(words_directory, "/.words", sizeof(words_directory));
 
-while(true){
-	//Reads the .hangman save file if it exists, if it doesn't initializes it
-	FILE *save_file = fopen(hangman_directory, "r");
-	if(!save_file){
-		save_file = fopen(hangman_directory, "w");
+	while(true){
+		//Reads the .hangman save file if it exists, if it doesn't initializes it
+		FILE *save_file = fopen(hangman_directory, "r");
 		if(!save_file){
-			perror("Can not create .hangman!");
-			return EX_CANTCREAT;
+			save_file = fopen(hangman_directory, "w");
+			if(!save_file){
+				perror("Can not create .hangman!");
+				return EX_CANTCREAT;
+			}
+			fprintf(save_file, "0\n0\n0\n0\n");
+	
+			fclose(save_file);
+	
+			save_file = fopen(hangman_directory, "r");
+			if(!save_file){
+				perror("Can not open the .hangman file!");
+				return EX_NOINPUT;
+			}
 		}
-		fprintf(save_file, "0\n0\n0\n0\n");
+		struct savestate savestate;
+		read_savefile(save_file, &savestate);
 
+		//Opens up the dictionary in the directory, errors out if it's not there
+		FILE *dictionary = fopen(words_directory, "r");
+		if(!dictionary){
+			perror("Could not open .words file");
+			return EX_NOINPUT;
+		}
+	
+		int line_count = 0;
+		int ch;
+
+		//Gets the line count to be used to pick a random line later
+		//TODO: Could be implemented into a function
+		while ((ch = fgetc(dictionary)) != EOF){
+			if(ch == '\n'){
+				++line_count;
+			}
+		}
+	
+		//Closes and reopens the file so it can be read again
+		fclose(dictionary);
+		dictionary = fopen(words_directory, "r");
+	
+		//Sets the seed for the random number generator
+		srand(time(NULL));
+		int rand_line_number;
+
+		//Determines which line will be pulled out from the file.
+		//The +1 includes the final number
+		//TODO: Can be put in function.. maybe unnesscary?
+		rand_line_number = rand() % line_count + 1;
+
+		//Sets line_count to zero again so it can be reused
+		line_count = 0;
+
+		//Prepping getline function
+		char word[32] = "\0"; //Initialized default value because valgrind errors
+		wipe_string(word, strlen(word));
+		//Reads through each line of a file.
+		//getline() automatically malocs the *line for a variable char length
+		//If the line matches rand_line_number than the loop is broke so we can have our word
+		//TODO: Can probably be put in a function
+	
+		while ((fgets(word, sizeof(word), dictionary)) != EOF){
+			++line_count;
+			if(line_count == rand_line_number){
+				//Removing the newline from the word
+				word[strlen(word) - 1] = '\0';
+				break;
+			}
+		}
+		size_t len = strlen(word);
+		printf("DEBUG: %s\n", word);
+
+		char letter_guess;
+
+		//Generates a number that is used to compare to a full mask aka a win
+		unsigned int win_mask = 1;
+		win_mask <<= strlen(word);
+		win_mask -= 1;
+
+		//Defines what a miss is.  A character_matcher result including punctuation
+		unsigned int miss_mask = character_matcher(word, '\0');
+	
+		//Intializes values to be used in the loop later
+		unsigned int current_mask = 0;
+		unsigned int result_mask;
+
+		//Using a buffer to avoid modifying word directly
+		char temp_word[64] = "\0"; //initialized default values because valgrind
+		int guess_count = 0;
+
+		while(true){
+
+			//Breaks out of loop if player wins
+			if(current_mask == win_mask){
+				printf("You win!\n");
+				++savestate.wins;
+				break;
+			}
+			//Breaks out of a loop if player makes 6 bad guesses, aka a loss
+			if(guess_count == 6){
+				printf("You lose!\n");
+				++savestate.losses;
+				break;
+			}
+		
+			//Gets character
+			//TODO: do error handling for get_letter()
+			printf("Guess a letter: ");
+			get_letter(&letter_guess);
+
+			//Captures a result mask and ors it with the current mask
+
+		//Figures out how many characters are in the word and returns the resulting mask
+			result_mask = character_matcher(word, letter_guess);
+	
+			//Checks for a bad guess
+			if(result_mask == miss_mask){
+				printf("Bad guess!\n");
+				++guess_count;
+			}
+
+			//Or's the current mask so program can keep track of player progress
+			current_mask |= result_mask;
+
+
+		//Creating a temporary array for word so function doesn't modify the original word
+			strncpy(temp_word, word, strlen(word));
+
+			result_printer(temp_word, current_mask, len);
+			printf("%s\n", temp_word);
+
+			wipe_string(temp_word, len);
+
+
+
+		}
+
+		//Wipes out buffers and masks to make rerunning the program more reliable
+		result_mask = 0;
+		win_mask = 0;
+		current_mask = 0;
+
+		fclose(dictionary);
 		fclose(save_file);
 
-		save_file = fopen(hangman_directory, "r");
-		if(!save_file){
-			perror("Can not open the .hangman file!");
-			return EX_NOINPUT;
-		}
-	}
-	struct savestate savestate;
-	read_savefile(save_file, &savestate);
 
-	//Opens up the dictionary in the directory, errors out if it's not there
-	FILE *dictionary = fopen(words_directory, "r");
-	if(!dictionary){
-		perror("Could not open .words file");
-		return EX_NOINPUT;
-	}
+		save_file = fopen(hangman_directory, "w");
+			if(!save_file){
+				perror("Can not open .hangman to write to!");
+				return EX_NOINPUT;
+			}
 
-	int line_count = 0;
-	int ch;
+		write_savefile(save_file, savestate);
+		fclose(save_file);
 
-	//Gets the line count to be used to pick a random line later
-	//TODO: Could be implemented into a function
-	while ((ch = fgetc(dictionary)) != EOF){
-		if(ch == '\n'){
-			++line_count;
-		}
-	}
-
-	//Closes and reopens the file so it can be read again
-	fclose(dictionary);
-	dictionary = fopen(words_directory, "r");
-
-	//Sets the seed for the random number generator
-	srand(time(NULL));
-	int rand_line_number;
-
-	//Determines which line will be pulled out from the file.
-	//The +1 includes the final number
-	//TODO: Can be put in function.. maybe unnesscary?
-	rand_line_number = rand() % line_count + 1;
-
-	//Sets line_count to zero again so it can be reused
-	line_count = 0;
-
-	//Prepping getline function
-	char word[32] = "default";
-	wipe_string(word, strlen(word));
-	//Reads through each line of a file.
-	//getline() automatically malocs the *line for a variable char length
-	//If the line matches rand_line_number than the loop is broke so we can have our word
-	//TODO: Can probably be put in a function
-	
-	while ((fgets(word, sizeof(word), dictionary)) != EOF){
-		++line_count;
-		if(line_count == rand_line_number){
-			//Removing the newline from the word
-			word[strlen(word) - 1] = '\0';
-			break;
-		}
-	}
-	printf("DEBUG: %s\n", word);
-
-	char letter_guess;
-
-	//Generates a number that is used to compare to a full mask aka a win
-	unsigned int win_mask = 1;
-	win_mask <<= strlen(word);
-	win_mask -= 1;
-
-	//Defines what a miss is.  A character_matcher result including punctuation
-	unsigned int miss_mask = character_matcher(word, '1');
-
-	//Intializes values to be used in the loop later
-	unsigned int current_mask = 0;
-	unsigned int result_mask;
-
-	//Using a buffer to avoid modifying word directly
-	char temp_word[64];
-	int guess_count = 0;
-
-	while(true){
-
-		//Breaks out of loop if player wins
-		if(current_mask == win_mask){
-			printf("You win!\n");
-			++savestate.wins;
-			break;
-		}
-		//Breaks out of a loop if player makes 6 bad guesses, aka a loss
-		if(guess_count == 6){
-			printf("You lose!\n");
-			++savestate.losses;
-			break;
-		}
-		
-		//Gets character
-		//TODO: do error handling for get_letter()
-		printf("Guess a letter: ");
-		get_letter(&letter_guess);
-
-		//Captures a result mask and ors it with the current mask
-
-	//Figures out how many characters are in the word and returns the resulting mask
-		result_mask = character_matcher(word, letter_guess);
-
-		//Checks for a bad guess
-		if(result_mask == miss_mask){
-			printf("Bad guess!\n");
-			++guess_count;
-		}
-
-		//Or's the current mask so program can keep track of player progress
-		current_mask |= result_mask;
-
-
-	//Creating a temporary array for word so function doesn't modify the original word
-		strncpy(temp_word, word, strlen(word));
-		result_printer(temp_word, current_mask, strlen(temp_word));
-
-		printf("%s\n", temp_word);
-		wipe_string(temp_word, strlen(temp_word));
-
+		//TODO: add char to a list of guessed characters
+		//TODO: chastize user if he guesses a character already guessed
 
 	}
-
-	//Wipes out buffers and masks to make rerunning the program more reliable
-	result_mask = 0;
-	win_mask = 0;
-	current_mask = 0;
-
-	fclose(dictionary);
-	fclose(save_file);
-
-
-	save_file = fopen(hangman_directory, "w");
-		if(!save_file){
-			perror("Can not open .hangman to write to!");
-			return EX_NOINPUT;
-		}
-
-	write_savefile(save_file, savestate);
-	fclose(save_file);
-
-	//TODO: add char to a list of guessed characters
-	//TODO: chastize user if he guesses a character already guessed
-
-}
 }
 
 
