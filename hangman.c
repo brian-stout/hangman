@@ -5,6 +5,23 @@
 #include <sysexits.h>
 #include <time.h>
 
+/* A function that passes a string and a character
+	The function iterates through each character of the string, and if
+	the characters match up, it sets the flag to 1 and returns a bit mask
+	for all the places it was correct.
+
+	If function return a zero, the player had a miss
+*/
+int character_matcher(char *, char);
+
+
+/*  A function that passes a string and a bit mask
+	The function iterates through each character of a string and
+	if the bit in the mask is set to 1, will print out that character,
+	else it'll print out an underscore unless it's a nonalphabet character
+
+*/
+void result_printer(char *string, int bitmask);
 
 int main(void)
 {
@@ -77,4 +94,19 @@ int main(void)
 	//making sure to free line because it was malloc'd
 	free(word);
 	fclose(dictionary);
+
+	//TODO: Get a char from the user and run it through the character_matcher
+	//TODO: add char to a list of guessed characters
+	//TODO: chastize user if he guesses a character already guessed
+}
+
+
+int character_matcher(char *string, char ch)
+{
+	return;
+}
+
+int result_printer(char *string, int bitmask)
+{
+	return;
 }
