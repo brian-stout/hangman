@@ -323,8 +323,8 @@ void write_savefile(FILE *savefile, struct savestate savestate)
 }
 
 
-void wipe_string(char *string, size_t length){
-	for(size_t i = 0; i < length; ++i){
+void wipe_string(char *string, size_t word_len){
+	for(size_t i = 0; i < word_len; ++i){
 		string[i] = '\0';
 	}
 }
