@@ -7,6 +7,7 @@
 #include <sysexits.h>
 #include <time.h>
 
+
 /* A function that passes a string and a character
 	The function iterates through each character of the string, and if
 	the characters match up, it sets the flag to 1 and returns a bit mask
@@ -30,6 +31,18 @@ void result_printer(char *, int);
 
 void get_letter(char *);
 
+//int read_savefile(FILE *, struct savestate);
+
+struct savestate{
+
+	//Variables for the save state
+	int stat_amount;
+	int wins;
+	int losses;
+	int winning_streak;
+	int losing_streak;
+};
+
 int main(void)
 {
 	const char *name = "HOME";
@@ -37,15 +50,37 @@ int main(void)
 
 	envptr = getenv(name);
 
-	char home_directory[16];
+	char words_directory[16];
+	char hangman_directory[16];
 
-	//Copies whats in envptr to home_directory buffer so we don't write over env variables
-	strncpy(home_directory, envptr, strlen(envptr));
+	//Copies home directory path to two  buff arrays to avoid writing over env variables
+	strncpy(hangman_directory, envptr, strlen(envptr));
+	strncpy(words_directory, envptr, strlen(envptr));
 
-	//Makes full directory path to .hangman file
-	strncat(home_directory, "/.words", sizeof(home_directory));
+	//Cats the correct file names to the end of the directory
+	strncat(hangman_directory, "/.hangman", sizeof(hangman_directory));
+	strncat(words_directory, "/.words", sizeof(words_directory));
 
-	FILE *dictionary = fopen(home_directory, "r");
+
+	//Reads the .hangman save file if it exists, if it doesn't initializes it
+	FILE *save_file = fopen(hangman_directory, "r");
+	if(!save_file){
+		save_file = fopen(hangman_directory, "w");
+		fprintf(save_file, "0\n0\n0\n0\n");
+
+		fclose(save_file);
+
+		save_file = fopen(hangman_directory, "r");
+		if(!save_file){
+			perror("Can not read or write to .hangman file!");
+			return EX_NOINPUT;
+		}
+	}
+	//struct savestate savestate;
+	//read_savefile(save_file,
+
+	//Opens up the dictionary in the directory, errors out if it's not there
+	FILE *dictionary = fopen(words_directory, "r");
 	if(!dictionary){
 		perror("Could not open .words file");
 		return EX_NOINPUT;
@@ -64,7 +99,7 @@ int main(void)
 
 	//Closes and reopens the file so it can be read again
 	fclose(dictionary);
-	dictionary = fopen(home_directory, "r");
+	dictionary = fopen(words_directory, "r");
 
 	//Sets the seed for the random number generator
 	srand(time(NULL));
@@ -161,6 +196,7 @@ int main(void)
 	
 	//making sure to free line because it was malloc'd
 	free(word);
+
 	free(temp_word);
 	fclose(dictionary);
 
@@ -182,7 +218,7 @@ int character_matcher(char string[], char chr)
 	}
 	for(size_t i = 0; i < strlen(string); ++i){
 		if(string[i] == chr || string[i] == alt_chr || isalpha(string[i]) == 0){
-			mask  |= 1;
+			mask |= 1;
 		} 
 			mask <<= 1;
 	}
@@ -192,6 +228,7 @@ int character_matcher(char string[], char chr)
 
 void result_printer(char *string, int bitmask)
 {
+	//Starting at end to match the bitmask
 	for(int i = strlen(string) - 1; i >= 0; --i){
 		if((bitmask & 1) != 1){
 			string[i] = '_';
@@ -204,3 +241,11 @@ void get_letter(char *chr)
 {
 	fgets(chr, sizeof(chr), stdin);
 }
+/*
+int read_savefile(FILE *savefile, struct *savestate)
+{
+		char buf[8];
+		fgets(buf, sizeof(buf), savefile);
+
+}
+*/
