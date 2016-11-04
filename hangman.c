@@ -1,4 +1,3 @@
-#define _GNU_SOURCE
 #include <ctype.h>
 #include <math.h>
 #include <stdio.h>
@@ -49,9 +48,9 @@ void wipe_string(char *, size_t);
 
 int main(void)
 {
+	//Gets a path to the users home directory
 	const char *name = "HOME";
 	char *envptr;
-
 	envptr = getenv(name);
 
 	char words_directory[32];
@@ -84,6 +83,9 @@ int main(void)
 				return EX_NOINPUT;
 			}
 		}
+
+		//Initialized a struct that will keep track of stats
+		//Will be passed to a function later to save the states on round completion
 		struct savestate savestate;
 		read_savefile(save_file, &savestate);
 
@@ -124,11 +126,9 @@ int main(void)
 		//Prepping getline function
 		char word[32] = "\0"; //Initialized default value because valgrind errors
 		wipe_string(word, strlen(word));
+
 		//Reads through each line of a file.
-		//getline() automatically malocs the *line for a variable char length
-		//If the line matches rand_line_number than the loop is broke so we can have our word
 		//TODO: Can probably be put in a function
-	
 		while ((fgets(word, sizeof(word), dictionary)) != EOF){
 			++line_count;
 			if(line_count == rand_line_number){
@@ -180,7 +180,7 @@ int main(void)
 
 			//Captures a result mask and ors it with the current mask
 
-		//Figures out how many characters are in the word and returns the resulting mask
+			//Figures out how many characters are in the word and returns the resulting mask
 			result_mask = character_matcher(word, letter_guess);
 	
 			//Checks for a bad guess
@@ -192,17 +192,13 @@ int main(void)
 			//Or's the current mask so program can keep track of player progress
 			current_mask |= result_mask;
 
-
-		//Creating a temporary array for word so function doesn't modify the original word
+			//Creating a temporary array for word so function doesn't modify the original word
 			strncpy(temp_word, word, strlen(word));
 
 			result_printer(temp_word, current_mask, len);
 			printf("%s\n", temp_word);
 
 			wipe_string(temp_word, len);
-
-
-
 		}
 
 		//Wipes out buffers and masks to make rerunning the program more reliable
@@ -213,7 +209,6 @@ int main(void)
 		fclose(dictionary);
 		fclose(save_file);
 
-
 		save_file = fopen(hangman_directory, "w");
 			if(!save_file){
 				perror("Can not open .hangman to write to!");
@@ -222,10 +217,6 @@ int main(void)
 
 		write_savefile(save_file, savestate);
 		fclose(save_file);
-
-		//TODO: add char to a list of guessed characters
-		//TODO: chastize user if he guesses a character already guessed
-
 	}
 }
 
