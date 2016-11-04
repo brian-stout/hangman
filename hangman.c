@@ -208,7 +208,9 @@ int main(void)
 			perror("Can not open .hangman to write to!");
 			return EX_NOINPUT;
 		}
-	
+
+	write_savefile(save_file, savestate);
+
 	//TODO: add char to a list of guessed characters
 	//TODO: chastize user if he guesses a character already guessed
 }
