@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sysexits.h>
+#include <time.h>
 
 
 int main(void)
@@ -23,29 +24,56 @@ int main(void)
 		return EX_NOINPUT;
 	}
 
-	size_t line_count = 0;
+
+	int line_count = 0;
 	int ch;
 
+	//Gets the line count to be used to pick a random line later
+	//Could be implemented into a function
 	while ((ch = fgetc(dictionary)) != EOF){
 		if(ch == '\n'){
 			++line_count;
 		}
 	}
 
+	//Closes and reopens the file so it can be read again
 	fclose(dictionary);
 	dictionary = fopen(home_directory, "r");
 
-	char *line = NULL;
+
+
+	printf("DEBUG: %d\n", line_count);
+
+	//Sets the seed for the random number generator
+	srand(time(NULL));
+	int rand_line_number;
+
+	//Determines which line will be pulled out from the file.
+	//The +1 includes the final number
+	rand_line_number = rand() % line_count + 1;
+
+	//Sets line_count to zero again so it can be reused
+	line_count = 0;
+
+	//Prepping getline function
+	char *word = NULL;
 	size_t len = 0;
 	ssize_t read;
 
-	printf("%zu\n", line_count);
-
-	while ((read = getline(&line, &len, dictionary)) != -1){
-		printf("%s", line);
+	//Reads through each line of a file.
+	//getline() automatically malocs the *line for a variable char length
+	//If the line matches rand_line_number than the loop is broke so we can have our word
+	while ((read = getline(&word, &len, dictionary)) != -1){
+		++line_count;
+		if(line_count == rand_line_number){
+			//Removing the newline from the word
+			//word[strlen(word) - 1] = '\0';
+			break;
+		}
 	}
+	printf("DEBUG: %s\n", word);
 	
-	//getline() automatically mallocs the *line for variable char length 
-	free(line);
+	//making sure to free line because it was malloc'd
+	free(word);
 	fclose(dictionary);
 }
