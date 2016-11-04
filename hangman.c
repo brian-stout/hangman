@@ -63,7 +63,7 @@ int main(void)
 	strncat(hangman_directory, "/.hangman", sizeof(hangman_directory));
 	strncat(words_directory, "/.words", sizeof(words_directory));
 
-
+/*
 	//Reads the .hangman save file if it exists, if it doesn't initializes it
 	FILE *save_file = fopen(hangman_directory, "r");
 	if(!save_file){
@@ -84,10 +84,10 @@ int main(void)
 	}
 	struct savestate savestate;
 	read_savefile(save_file, &savestate);
-
 	printf("%d\n", savestate.losses);
 
 	fclose(save_file);
+*/
 	
 	//Opens up the dictionary in the directory, errors out if it's not there
 	FILE *dictionary = fopen(words_directory, "r");
@@ -140,6 +140,7 @@ int main(void)
 		}
 	}
 	printf("DEBUG: %s\n", word);
+	fclose(dictionary);
 
 
 	char letter_guess;
@@ -205,7 +206,7 @@ int main(void)
 	//making sure to free line because it was malloc'd
 	free(word);
 	free(temp_word);
-	fclose(dictionary);
+	
 
 	//TODO: Get a char from the user and run it through the character_matcher
 	//TODO: add char to a list of guessed characters
@@ -248,21 +249,21 @@ void get_letter(char *chr)
 {
 	fgets(chr, sizeof(chr), stdin);
 }
-
-void read_savefile(FILE *savefile, struct savestate *mystruct)
+/*
+void read_savefile(FILE *savefile, struct savestate *savestate)
 {
 		char savebuf[16];
 		fgets(savebuf, sizeof(savebuf), savefile);
-		mystruct->wins = strtol(savebuf, NULL, 10);
+		savestate->wins = strtol(savebuf, NULL, 10);
 
 		fgets(savebuf, sizeof(savebuf), savefile);
-		mystruct->losses = strtol(savebuf, NULL, 10);
+		savestate->losses = strtol(savebuf, NULL, 10);
 
 		fgets(savebuf, sizeof(savebuf), savefile);
-		mystruct->winning_streak = strtol(savebuf, NULL, 10);
+		savestate->winning_streak = strtol(savebuf, NULL, 10);
 
 		fgets(savebuf, sizeof(savebuf), savefile);
-		mystruct->losing_streak = strtol(savebuf, NULL, 10);
+		savestate->losing_streak = strtol(savebuf, NULL, 10);
 
 }
-
+*/
