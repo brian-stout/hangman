@@ -209,6 +209,7 @@ int main(void)
 		}
 
 	write_savefile(save_file, savestate);
+	fclose(save_file);
 
 	//TODO: add char to a list of guessed characters
 	//TODO: chastize user if he guesses a character already guessed
