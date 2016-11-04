@@ -196,7 +196,6 @@ int main(void)
 		printf("%s\n", temp_word);
 	}
 
-	
 	//making sure to free line because it was malloc'd
 	free(word);
 	free(temp_word);
