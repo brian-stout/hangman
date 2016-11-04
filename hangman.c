@@ -209,7 +209,6 @@ int main(void)
 			}
 		
 			//Gets character
-			//TODO: do error handling for get_letter()
 			printf("Guess a letter: ");
 			letter_guess = get_letter();
 
