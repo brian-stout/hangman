@@ -19,7 +19,7 @@ int main(void)
 	strncpy(home_directory, envptr, strlen(envptr));
 
 	//Makes full directory path to .hangman file
-	strncat(home_directory, "/.hangman", sizeof(home_directory));
+	strncat(home_directory, "/.words", sizeof(home_directory));
 
 	FILE *dictionary = fopen(home_directory, "r");
 	if(!dictionary){
@@ -50,6 +50,8 @@ int main(void)
 	//The +1 includes the final number
 	//TODO: Can be put in function.. maybe unnesscary?
 	rand_line_number = rand() % line_count + 1;
+	printf("DEBUG: There are %d lines in this file\n", line_count);
+	printf("DEBUG: The random line is %d\n", rand_line_number);
 
 	//Sets line_count to zero again so it can be reused
 	line_count = 0;
