@@ -270,10 +270,10 @@ int character_matcher(char string[], char chr, size_t word_len)
 	return mask;
 }
 
-void result_printer(char *string, int bitmask, size_t len)
+void result_printer(char *string, int bitmask, size_t word_len)
 {
 	//Starting at end to match the bitmask
-	for(int i = len - 1; i >= 0; --i){
+	for(int i = word_len - 1; i >= 0; --i){
 		if((bitmask & 1) != 1){
 			string[i] = '_';
 		}
