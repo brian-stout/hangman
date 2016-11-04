@@ -270,6 +270,7 @@ int character_matcher(char string[], char chr, size_t word_len)
 	return mask;
 }
 
+
 void result_printer(char *string, int bitmask, size_t word_len)
 {
 	//Starting at end to match the bitmask
@@ -281,11 +282,13 @@ void result_printer(char *string, int bitmask, size_t word_len)
 	}
 }
 
+
 void get_letter(char *chr)
 {
 	fgets(chr, sizeof(chr), stdin);
 	chr[1] = '\0';
 }
+
 
 void read_savefile(FILE *savefile, struct savestate *savestate)
 {
@@ -308,6 +311,7 @@ void read_savefile(FILE *savefile, struct savestate *savestate)
 
 }
 
+
 void write_savefile(FILE *savefile, struct savestate savestate)
 {
 	fprintf(savefile, "%d\n", savestate.wins);
@@ -318,9 +322,9 @@ void write_savefile(FILE *savefile, struct savestate savestate)
 
 }
 
+
 void wipe_string(char *string, size_t length){
 	for(size_t i = 0; i < length; ++i){
 		string[i] = '\0';
 	}
 }
-
