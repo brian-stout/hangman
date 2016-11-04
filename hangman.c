@@ -122,14 +122,14 @@ while(true){
 	line_count = 0;
 
 	//Prepping getline function
-	char *word = NULL;
-	size_t len = 0;
-
+	char word[32] = "default";
+	wipe_string(word, strlen(word));
 	//Reads through each line of a file.
 	//getline() automatically malocs the *line for a variable char length
 	//If the line matches rand_line_number than the loop is broke so we can have our word
 	//TODO: Can probably be put in a function
-	while ((getline(&word, &len, dictionary)) != -1){
+	
+	while ((fgets(word, sizeof(word), dictionary)) != EOF){
 		++line_count;
 		if(line_count == rand_line_number){
 			//Removing the newline from the word
@@ -153,8 +153,8 @@ while(true){
 	unsigned int current_mask = 0;
 	unsigned int result_mask;
 
-	//Automatically assigns memory for a buffer so word won't be modified by the print function
-	char *temp_word = (char *) malloc(strlen(word));
+	//Using a buffer to avoid modifying word directly
+	char temp_word[64];
 	int guess_count = 0;
 
 	while(true){
@@ -197,19 +197,16 @@ while(true){
 		result_printer(temp_word, current_mask);
 
 		printf("%s\n", temp_word);
+		wipe_string(temp_word, strlen(temp_word));
 
 
 	}
 
 	//Wipes out buffers and masks to make rerunning the program more reliable
-	wipe_string(temp_word, strlen(temp_word));
 	result_mask = 0;
 	win_mask = 0;
 	current_mask = 0;
 
-	//making sure to free line because it was malloc'd
-	free(word);
-	free(temp_word);
 	fclose(dictionary);
 	fclose(save_file);
 
