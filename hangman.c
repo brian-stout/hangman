@@ -71,7 +71,7 @@ int main(void)
 		fclose(save_file);
 
 		save_file = fopen(hangman_directory, "w+");
-		fprintf(save_file, "0\n0\n0\n0\n");
+		fprintf(save_file, "1\n3\n6\n7\n");
 
 		fclose(save_file);
 
@@ -83,6 +83,8 @@ int main(void)
 	}
 	struct savestate savestate;
 	savestate = read_savefile(save_file, savestate);
+
+	printf("DEBUG: %d\n", savestate.wins);
 
 	//Opens up the dictionary in the directory, errors out if it's not there
 	FILE *dictionary = fopen(words_directory, "r");
@@ -114,8 +116,6 @@ int main(void)
 	//The +1 includes the final number
 	//TODO: Can be put in function.. maybe unnesscary?
 	rand_line_number = rand() % line_count + 1;
-	printf("DEBUG: There are %d lines in this file\n", line_count);
-	printf("DEBUG: The random line is %d\n", rand_line_number);
 
 	//Sets line_count to zero again so it can be reused
 	line_count = 0;
