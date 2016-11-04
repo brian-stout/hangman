@@ -205,8 +205,8 @@ int main(void)
 
 	save_file = fopen(hangman_directory, "w");
 		if(!save_file){
-			perror("Can not create .hangman!");
-			return EX_CANTCREAT;
+			perror("Can not open .hangman to write to!");
+			return EX_NOINPUT;
 		}
 	
 	//TODO: add char to a list of guessed characters
