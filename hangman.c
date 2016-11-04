@@ -207,7 +207,30 @@ int main(void)
 				}
 				break;
 			}
-		
+			char win_grammar = 's';
+			char loss_grammar[8] = "es";
+
+			if(savestate.wins < 2){
+				win_grammar = '\0';
+			}
+			else{
+				win_grammar = 's';
+			}
+			printf("Game %d. %d win%s//%d loss%s. Average score: %d\n",,
+			printf("Game %d. ", savestate.losses + savestate.wins);
+			if(savestate.wins > 2){
+				printf("%d wins//", savestate.wins);
+			}
+			else{
+				printf("%d win//", savestate.wins);
+			}
+			if(savestate.losses > 2){
+				printf("%d losses", savestate.losses);
+			}
+			else{
+				printf("%d loss", savestate.losses);
+			}			
+			
 			//Gets character
 			printf("Guess a letter: ");
 			letter_guess = get_letter();
