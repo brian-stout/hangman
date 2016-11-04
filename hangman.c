@@ -1,4 +1,5 @@
 #define _GNU_SOURCE
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,6 +21,8 @@ int character_matcher(char *, char);
 	The function iterates through each character of a string and
 	if the bit in the mask is set to 1, will print out that character,
 	else it'll print out an underscore unless it's a nonalphabet character
+
+	TODO: Write logic to test for unicode and handle it properly
 
 */
 void result_printer(char *, int);
@@ -91,6 +94,13 @@ int main(void)
 		}
 	}
 	printf("DEBUG: %s\n", word);
+
+
+	//TODO: Add error checking for letter guess, maybe put it in a function
+	char letter_guess = fgetc(stdin);
+
+	printf("%c\n", letter_guess);
+	character_matcher(word, letter_guess);
 	
 	//making sure to free line because it was malloc'd
 	free(word);
@@ -102,9 +112,22 @@ int main(void)
 }
 
 
-int character_matcher(char *string, char ch)
+int character_matcher(char *string, char chr)
 {
-	return;
+	unsigned int mask = 0x0;
+	char alt_chr;
+	if(isupper(chr)){
+		alt_chr = tolower(chr);
+	}
+	else if (islower(chr)){
+		alt_chr = toupper(chr);
+	}
+	for(size_t i = 0; string[i] != '\0'; ++i){
+		if(string[i] == chr || string[i] == alt_chr){
+			printf("This is a character match!\n");
+		} 
+	}
+	return 1;
 }
 
 void result_printer(char *string, int bitmask)
