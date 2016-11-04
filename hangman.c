@@ -1,5 +1,6 @@
 #define _GNU_SOURCE
 #include <ctype.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -97,10 +98,43 @@ int main(void)
 
 
 	//TODO: Add error checking for letter guess, maybe put it in a function
+	//TODO: Keep track of all the guesses that have happened
+
+	unsigned int win_mask = 1;
+	win_mask <<= 6;
+	win_mask -= 1;
+	printf("DEBUG: Figuring out the win number %d\n", win_mask);
+	printf("The win number is %d\n", win_mask);
 	char letter_guess = fgetc(stdin);
 
 	printf("%c\n", letter_guess);
-	character_matcher(word, letter_guess);
+	unsigned int current_mask = 0;
+
+	while(current_mask != win_mask){
+
+	char letter_guess = fgetc(stdin);
+
+	unsigned int result_mask;
+	result_mask = character_matcher(word, letter_guess);
+
+	current_mask |= result_mask;
+
+	printf("The win number is %x\n", win_mask);
+
+	printf("DEBUG: The result mask is %d\n", result_mask);
+	printf("DEBUG: The current mask is %d\n", current_mask);
+
+	//TODO: Malloc the buff
+	//Creating a buffer for word so function doesn't modify it
+	char buf[16];
+	strncpy(buf, word, strlen(word));
+	result_printer(buf, current_mask);
+
+	printf("DEBUG: Checking if word is fine %s\n", word);
+
+	}
+
+	
 	
 	//making sure to free line because it was malloc'd
 	free(word);
@@ -112,9 +146,9 @@ int main(void)
 }
 
 
-int character_matcher(char *string, char chr)
+int character_matcher(char string[], char chr)
 {
-	unsigned int mask = 0x0;
+	unsigned int mask = 0;
 	char alt_chr;
 	if(isupper(chr)){
 		alt_chr = tolower(chr);
@@ -122,15 +156,23 @@ int character_matcher(char *string, char chr)
 	else if (islower(chr)){
 		alt_chr = toupper(chr);
 	}
-	for(size_t i = 0; string[i] != '\0'; ++i){
+	for(size_t i = 0; i < strlen(string); ++i){
 		if(string[i] == chr || string[i] == alt_chr){
-			printf("This is a character match!\n");
+			mask  |= 1;
 		} 
+			mask <<= 1;
 	}
-	return 1;
+	mask >>= 1;
+	return mask;
 }
 
 void result_printer(char *string, int bitmask)
 {
-	return;
+	for(int i = strlen(string) - 1; i >= 0; --i){
+		if((bitmask & 1) != 1){
+			string[i] = '_';
+		}
+		bitmask >>= 1;
+	}
+	printf("%s\n", string);
 }
