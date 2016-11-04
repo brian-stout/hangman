@@ -191,12 +191,20 @@ int main(void)
 			if(current_mask == win_mask){
 				printf("You win!\n");
 				++savestate.wins;
+				++savestate.winning_streak;
+				if(savestate.losing_streak > 0){
+					savestate.losing_streak = 0;
+				}
 				break;
 			}
 			//Breaks out of a loop if player makes 6 bad guesses, aka a loss
 			if(guess_count == 6){
 				printf("You lose!\n");
 				++savestate.losses;
+				++savestate.losing_streak;
+				if(savestate.winning_streak > 0){
+					savestate.winning_streak = 0;
+				}
 				break;
 			}
 		
