@@ -13,6 +13,7 @@ struct savestate{
 	//Variables for the save state
 	int wins;
 	int losses;
+	int miss_amount;
 	int winning_streak;
 	int losing_streak;
 };
@@ -44,6 +45,8 @@ void read_savefile(FILE *, struct savestate *);
 
 void write_savefile(FILE *, struct savestate);
 
+void wipe_string(char *, size_t);
+
 int main(void)
 {
 	const char *name = "HOME";
@@ -62,7 +65,7 @@ int main(void)
 	strncat(hangman_directory, "/.hangman", sizeof(hangman_directory));
 	strncat(words_directory, "/.words", sizeof(words_directory));
 
-
+while(true){
 	//Reads the .hangman save file if it exists, if it doesn't initializes it
 	FILE *save_file = fopen(hangman_directory, "r");
 	if(!save_file){
@@ -194,13 +197,22 @@ int main(void)
 		result_printer(temp_word, current_mask);
 
 		printf("%s\n", temp_word);
+
+
 	}
+
+	//Wipes out buffers and masks to make rerunning the program more reliable
+	wipe_string(temp_word, strlen(temp_word));
+	result_mask = 0;
+	win_mask = 0;
+	current_mask = 0;
 
 	//making sure to free line because it was malloc'd
 	free(word);
 	free(temp_word);
 	fclose(dictionary);
 	fclose(save_file);
+
 
 	save_file = fopen(hangman_directory, "w");
 		if(!save_file){
@@ -213,6 +225,8 @@ int main(void)
 
 	//TODO: add char to a list of guessed characters
 	//TODO: chastize user if he guesses a character already guessed
+
+}
 }
 
 
@@ -277,5 +291,11 @@ void write_savefile(FILE *savefile, struct savestate savestate)
 	fprintf(savefile, "%d\n", savestate.winning_streak);
 	fprintf(savefile, "%d\n", savestate.losing_streak);
 
+}
+
+void wipe_string(char *string, size_t length){
+	for(size_t i = 0; i < length; ++i){
+		string[i] = '\0';
+	}
 }
 
