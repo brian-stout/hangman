@@ -83,7 +83,6 @@ int main(void)
 	}
 	struct savestate savestate;
 	read_savefile(save_file, &savestate);
-	printf("%d\n", savestate.losses);
 
 	//Opens up the dictionary in the directory, errors out if it's not there
 	FILE *dictionary = fopen(words_directory, "r");
@@ -204,9 +203,12 @@ int main(void)
 	fclose(dictionary);
 	fclose(save_file);
 
-	save_file = FOPEN
+	save_file = fopen(hangman_directory, "w");
+		if(!save_file){
+			perror("Can not create .hangman!");
+			return EX_CANTCREAT;
+		}
 	
-
 	//TODO: add char to a list of guessed characters
 	//TODO: chastize user if he guesses a character already guessed
 }
