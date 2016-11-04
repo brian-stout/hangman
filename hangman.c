@@ -28,7 +28,7 @@ int character_matcher(char *, char);
 */
 void result_printer(char *, int);
 
-char get_letter(void);
+void get_letter(char *);
 
 int main(void)
 {
@@ -118,9 +118,9 @@ int main(void)
 
 		//Gets character
 		//TODO: Put this in a function with error handling
-		printf("DEBUG: The word is %s\n", word);
 		printf("Guess a letter: ");
-		letter_guess = get_letter();
+		get_letter(&letter_guess);
+		printf("DEBUG: the letter is %c\n", letter_guess);
 
 		//Captures a result mask and ors it with the current mask
 
@@ -179,9 +179,8 @@ void result_printer(char *string, int bitmask)
 	}
 }
 
-char get_letter(void)
+void get_letter(char *chr)
 {
-	char buf[2];
-	fgets(buf, sizeof(buf), stdin);
-	return buf[0];
+	fgets(chr, sizeof(chr), stdin);
+	return 1;
 }
