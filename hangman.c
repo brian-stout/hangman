@@ -7,6 +7,14 @@
 #include <sysexits.h>
 #include <time.h>
 
+struct savestate{
+
+	//Variables for the save state
+	int wins;
+	int losses;
+	int winning_streak;
+	int losing_streak;
+};
 
 /* A function that passes a string and a character
 	The function iterates through each character of the string, and if
@@ -31,19 +39,11 @@ void result_printer(char *, int);
 
 void get_letter(char *);
 
-struct savestate read_savefile(FILE *, struct savestate);
+void read_savefile(FILE *, struct savestate *);
 
 //int read_savefile(FILE *, struct savestate);
 
-struct savestate{
 
-	//Variables for the save state
-	int stat_amount;
-	int wins;
-	int losses;
-	int winning_streak;
-	int losing_streak;
-};
 
 int main(void)
 {
@@ -66,18 +66,13 @@ int main(void)
 
 	//Reads the .hangman save file if it exists, if it doesn't initializes it
 	FILE *save_file = fopen(hangman_directory, "r");
-	printf("DEBUG: Directory %s\n", words_directory);
-	printf("DEBUG: Directory %s\n", hangman_directory);
 	if(!save_file){
-		//Closes to be reopened
-		fclose(save_file);
-
 		save_file = fopen(hangman_directory, "w");
 		if(!save_file){
 			perror("Can not create .hangman!");
 			return EX_CANTCREAT;
 		}
-		fprintf(save_file, "1\n3\n6\n7\n");
+		fprintf(save_file, "0\n0\n0\n0\n");
 
 		fclose(save_file);
 
@@ -88,12 +83,12 @@ int main(void)
 		}
 	}
 	struct savestate savestate;
-	savestate = read_savefile(save_file, savestate);
+	read_savefile(save_file, &savestate);
+
+	printf("%d\n", savestate.losses);
 
 	fclose(save_file);
 	
-	printf("DEBUG: %d\n", savestate.wins);
-
 	//Opens up the dictionary in the directory, errors out if it's not there
 	FILE *dictionary = fopen(words_directory, "r");
 	if(!dictionary){
@@ -209,7 +204,6 @@ int main(void)
 	
 	//making sure to free line because it was malloc'd
 	free(word);
-
 	free(temp_word);
 	fclose(dictionary);
 
@@ -255,21 +249,20 @@ void get_letter(char *chr)
 	fgets(chr, sizeof(chr), stdin);
 }
 
-struct savestate read_savefile(FILE *savefile, struct savestate savestate)
+void read_savefile(FILE *savefile, struct savestate *mystruct)
 {
-		char buf[8];
-		fgets(buf, sizeof(buf), savefile);
-		savestate.wins = strtol(buf, NULL, 10);
+		char savebuf[16];
+		fgets(savebuf, sizeof(savebuf), savefile);
+		mystruct->wins = strtol(savebuf, NULL, 10);
 
-		fgets(buf, sizeof(buf), savefile);
-		savestate.losses = strtol(buf, NULL, 10);
+		fgets(savebuf, sizeof(savebuf), savefile);
+		mystruct->losses = strtol(savebuf, NULL, 10);
 
-		fgets(buf, sizeof(buf), savefile);
-		savestate.winning_streak = strtol(buf, NULL, 10);
+		fgets(savebuf, sizeof(savebuf), savefile);
+		mystruct->winning_streak = strtol(savebuf, NULL, 10);
 
-		fgets(buf, sizeof(buf), savefile);
-		savestate.losing_streak = strtol(buf, NULL, 10);
+		fgets(savebuf, sizeof(savebuf), savefile);
+		mystruct->losing_streak = strtol(savebuf, NULL, 10);
 
-		return savestate;
 }
 
