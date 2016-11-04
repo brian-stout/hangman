@@ -44,7 +44,7 @@ void result_printer(char *, int, size_t);
 /**	get_letter function is responsible for receiving user input
 *		as well as error handling user input
 */
-void get_letter(char *);
+char get_letter();
 
 /** read_savefile function reads the savefile ".hangman" that the
 *		program generates, parses that information and passes it to
@@ -203,7 +203,7 @@ int main(void)
 			//Gets character
 			//TODO: do error handling for get_letter()
 			printf("Guess a letter: ");
-			get_letter(&letter_guess);
+			letter_guess = get_letter();
 
 			//Captures a result mask and ors it with the current mask
 
@@ -229,7 +229,7 @@ int main(void)
 			wipe_string(temp_word, word_len);
 		}
 
-		//Wipes out buffers and masks to make rerunning the program more reliable
+		//Wipes out buffers and masks to make rerunning the program more stable
 		result_mask = 0;
 		win_mask = 0;
 		current_mask = 0;
@@ -283,10 +283,11 @@ void result_printer(char *string, int bitmask, size_t word_len)
 }
 
 
-void get_letter(char *chr)
+char get_letter()
 {
-	fgets(chr, sizeof(chr), stdin);
-	chr[1] = '\0';
+	char buf[32];
+	fgets(buf, sizeof(buf), stdin);
+	return(buf[0]);
 }
 
 
