@@ -31,6 +31,8 @@ void result_printer(char *, int);
 
 void get_letter(char *);
 
+struct savestate read_savefile(FILE *, struct savestate);
+
 //int read_savefile(FILE *, struct savestate);
 
 struct savestate{
@@ -65,7 +67,10 @@ int main(void)
 	//Reads the .hangman save file if it exists, if it doesn't initializes it
 	FILE *save_file = fopen(hangman_directory, "r");
 	if(!save_file){
-		save_file = fopen(hangman_directory, "w");
+		//Closes to be reopened
+		fclose(save_file);
+
+		save_file = fopen(hangman_directory, "w+");
 		fprintf(save_file, "0\n0\n0\n0\n");
 
 		fclose(save_file);
@@ -76,8 +81,8 @@ int main(void)
 			return EX_NOINPUT;
 		}
 	}
-	//struct savestate savestate;
-	//read_savefile(save_file,
+	struct savestate savestate;
+	savestate = read_savefile(save_file, savestate);
 
 	//Opens up the dictionary in the directory, errors out if it's not there
 	FILE *dictionary = fopen(words_directory, "r");
@@ -241,11 +246,22 @@ void get_letter(char *chr)
 {
 	fgets(chr, sizeof(chr), stdin);
 }
-/*
-int read_savefile(FILE *savefile, struct *savestate)
+
+struct savestate read_savefile(FILE *savefile, struct savestate savestate)
 {
 		char buf[8];
 		fgets(buf, sizeof(buf), savefile);
+		savestate.wins = strtol(buf, NULL, 10);
 
+		fgets(buf, sizeof(buf), savefile);
+		savestate.losses = strtol(buf, NULL, 10);
+
+		fgets(buf, sizeof(buf), savefile);
+		savestate.winning_streak = strtol(buf, NULL, 10);
+
+		fgets(buf, sizeof(buf), savefile);
+		savestate.losing_streak = strtol(buf, NULL, 10);
+
+		return savestate;
 }
-*/
+
