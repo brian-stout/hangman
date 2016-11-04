@@ -99,32 +99,45 @@ int main(void)
 	printf("DEBUG: %s\n", word);
 
 
-	//TODO: Add error checking for letter guess, maybe put it in a function
-	//TODO: Keep track of all the guesses that have happened
 	char letter_guess;
 
+	//Generates a number that is used to compare to a full mask aka a win
 	unsigned int win_mask = 1;
 	win_mask <<= strlen(word);
 	win_mask -= 1;
 
+	//Defines what a miss is.  A character_matcher result including punctuation
+	unsigned int miss_mask = character_matcher(word, '\0');
 
 	unsigned int current_mask = 0;
 	unsigned int result_mask;
 
-	char buf[16];
+	char *buf = (char *) malloc(strlen(word));
+	int guess_count = 0;
 
-
-	while(current_mask != win_mask){
-
+	while(1){
+		if(current_mask == win_mask){
+			printf("You win!\n");
+			break;
+		}
+		if(guess_count == 6){
+			printf("You lose!\n");
+			break;
+		}
+		
 		//Gets character
-		//TODO: Put this in a function with error handling
+		//TODO: do error handling for get_letter
 		printf("Guess a letter: ");
 		get_letter(&letter_guess);
-		printf("DEBUG: the letter is %c\n", letter_guess);
 
 		//Captures a result mask and ors it with the current mask
 
 		result_mask = character_matcher(word, letter_guess);
+		printf("DEBUG: result mask %x\n", result_mask);
+		if(result_mask == miss_mask){
+			printf("Bad guess!\n");
+			++guess_count;
+		}
 		current_mask |= result_mask;
 
 		//TODO: Malloc the buff
@@ -134,13 +147,13 @@ int main(void)
 		result_printer(buf, current_mask);
 
 		printf("%s\n", buf);
-
 	}
 
 	
 	
 	//making sure to free line because it was malloc'd
 	free(word);
+	free(buf);
 	fclose(dictionary);
 
 	//TODO: Get a char from the user and run it through the character_matcher
@@ -182,5 +195,4 @@ void result_printer(char *string, int bitmask)
 void get_letter(char *chr)
 {
 	fgets(chr, sizeof(chr), stdin);
-	return 1;
 }
