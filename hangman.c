@@ -28,6 +28,8 @@ int character_matcher(char *, char);
 */
 void result_printer(char *, int);
 
+char get_letter(void);
+
 int main(void)
 {
 	const char *name = "HOME";
@@ -99,38 +101,39 @@ int main(void)
 
 	//TODO: Add error checking for letter guess, maybe put it in a function
 	//TODO: Keep track of all the guesses that have happened
+	char letter_guess;
 
 	unsigned int win_mask = 1;
-	win_mask <<= 6;
+	win_mask <<= strlen(word);
 	win_mask -= 1;
-	printf("DEBUG: Figuring out the win number %d\n", win_mask);
-	printf("The win number is %d\n", win_mask);
-	char letter_guess = fgetc(stdin);
 
-	printf("%c\n", letter_guess);
+
 	unsigned int current_mask = 0;
+	unsigned int result_mask;
+
+	char buf[16];
+
 
 	while(current_mask != win_mask){
 
-	char letter_guess = fgetc(stdin);
+		//Gets character
+		//TODO: Put this in a function with error handling
+		printf("DEBUG: The word is %s\n", word);
+		printf("Guess a letter: ");
+		letter_guess = get_letter();
 
-	unsigned int result_mask;
-	result_mask = character_matcher(word, letter_guess);
+		//Captures a result mask and ors it with the current mask
 
-	current_mask |= result_mask;
+		result_mask = character_matcher(word, letter_guess);
+		current_mask |= result_mask;
 
-	printf("The win number is %x\n", win_mask);
+		//TODO: Malloc the buff
+		//Creating a buffer for word so function doesn't modify it
 
-	printf("DEBUG: The result mask is %d\n", result_mask);
-	printf("DEBUG: The current mask is %d\n", current_mask);
+		strncpy(buf, word, strlen(word));
+		result_printer(buf, current_mask);
 
-	//TODO: Malloc the buff
-	//Creating a buffer for word so function doesn't modify it
-	char buf[16];
-	strncpy(buf, word, strlen(word));
-	result_printer(buf, current_mask);
-
-	printf("DEBUG: Checking if word is fine %s\n", word);
+		printf("%s\n", buf);
 
 	}
 
@@ -157,7 +160,7 @@ int character_matcher(char string[], char chr)
 		alt_chr = toupper(chr);
 	}
 	for(size_t i = 0; i < strlen(string); ++i){
-		if(string[i] == chr || string[i] == alt_chr){
+		if(string[i] == chr || string[i] == alt_chr || isalpha(string[i]) == 0){
 			mask  |= 1;
 		} 
 			mask <<= 1;
@@ -174,5 +177,11 @@ void result_printer(char *string, int bitmask)
 		}
 		bitmask >>= 1;
 	}
-	printf("%s\n", string);
+}
+
+char get_letter(void)
+{
+	char buf[2];
+	fgets(buf, sizeof(buf), stdin);
+	return buf[0];
 }
