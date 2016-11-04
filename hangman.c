@@ -109,51 +109,59 @@ int main(void)
 	//Defines what a miss is.  A character_matcher result including punctuation
 	unsigned int miss_mask = character_matcher(word, '\0');
 
+	//Intializes values to be used in the loop later
 	unsigned int current_mask = 0;
 	unsigned int result_mask;
 
-	char *buf = (char *) malloc(strlen(word));
+	//Automatically assigns memory for a buffer so word won't be modified by the print function
+	char *temp_word = (char *) malloc(strlen(word));
 	int guess_count = 0;
 
 	while(1){
+
+		//Breaks out of loop if player wins
 		if(current_mask == win_mask){
 			printf("You win!\n");
 			break;
 		}
+		//Breaks out of a loop if player makes 6 bad guesses, aka a loss
 		if(guess_count == 6){
 			printf("You lose!\n");
 			break;
 		}
 		
 		//Gets character
-		//TODO: do error handling for get_letter
+		//TODO: do error handling for get_letter()
 		printf("Guess a letter: ");
 		get_letter(&letter_guess);
 
 		//Captures a result mask and ors it with the current mask
 
+	//Figures out how many characters are in the word and returns the resulting mask
 		result_mask = character_matcher(word, letter_guess);
-		printf("DEBUG: result mask %x\n", result_mask);
+
+		//Checks for a bad guess
 		if(result_mask == miss_mask){
 			printf("Bad guess!\n");
 			++guess_count;
 		}
+
+		//Or's the current mask so program can keep track of player progress
 		current_mask |= result_mask;
 
-		//TODO: Malloc the buff
-		//Creating a buffer for word so function doesn't modify it
 
-		strncpy(buf, word, strlen(word));
-		result_printer(buf, current_mask);
+	//Creating a temporary array for word so function doesn't modify the original word
+		strncpy(temp_word, word, strlen(word));
+		result_printer(temp_word, current_mask);
 
-		printf("%s\n", buf);
+		printf("%s\n", temp_word);
 	}
 
 	
 	
 	//making sure to free line because it was malloc'd
 	free(word);
-	free(buf);
+	free(temp_word);
 	fclose(dictionary);
 
 	//TODO: Get a char from the user and run it through the character_matcher
