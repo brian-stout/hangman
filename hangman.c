@@ -52,12 +52,12 @@ int main(void)
 
 	envptr = getenv(name);
 
-	char words_directory[16];
-	char hangman_directory[16];
+	char words_directory[32];
+	char hangman_directory[32];
 
 	//Copies home directory path to two  buff arrays to avoid writing over env variables
-	strncpy(hangman_directory, envptr, strlen(envptr));
-	strncpy(words_directory, envptr, strlen(envptr));
+	strncpy(hangman_directory, envptr, sizeof(hangman_directory));
+	strncpy(words_directory, envptr, sizeof(words_directory));
 
 	//Cats the correct file names to the end of the directory
 	strncat(hangman_directory, "/.hangman", sizeof(hangman_directory));
@@ -66,24 +66,32 @@ int main(void)
 
 	//Reads the .hangman save file if it exists, if it doesn't initializes it
 	FILE *save_file = fopen(hangman_directory, "r");
+	printf("DEBUG: Directory %s\n", words_directory);
+	printf("DEBUG: Directory %s\n", hangman_directory);
 	if(!save_file){
 		//Closes to be reopened
 		fclose(save_file);
 
-		save_file = fopen(hangman_directory, "w+");
+		save_file = fopen(hangman_directory, "w");
+		if(!save_file){
+			perror("Can not create .hangman!");
+			return EX_CANTCREAT;
+		}
 		fprintf(save_file, "1\n3\n6\n7\n");
 
 		fclose(save_file);
 
 		save_file = fopen(hangman_directory, "r");
 		if(!save_file){
-			perror("Can not read or write to .hangman file!");
+			perror("Can not write to .hangman file!");
 			return EX_NOINPUT;
 		}
 	}
 	struct savestate savestate;
 	savestate = read_savefile(save_file, savestate);
 
+	fclose(save_file);
+	
 	printf("DEBUG: %d\n", savestate.wins);
 
 	//Opens up the dictionary in the directory, errors out if it's not there
