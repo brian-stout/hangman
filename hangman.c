@@ -42,9 +42,7 @@ void get_letter(char *);
 
 void read_savefile(FILE *, struct savestate *);
 
-//int read_savefile(FILE *, struct savestate);
-
-
+void write_savefile(FILE *, struct savestate);
 
 int main(void)
 {
@@ -199,7 +197,6 @@ int main(void)
 		printf("%s\n", temp_word);
 	}
 
-	printf("%d \n %d\n", savestate.wins, savestate.losses);
 	
 	//making sure to free line because it was malloc'd
 	free(word);
@@ -264,6 +261,15 @@ void read_savefile(FILE *savefile, struct savestate *savestate)
 
 		fgets(savebuf, sizeof(savebuf), savefile);
 		savestate->losing_streak = strtol(savebuf, NULL, 10);
+
+}
+
+void write_savefile(FILE *savefile, struct savestate savestate)
+{
+	fprintf(savefile, "%d\n", savestate.wins);
+	fprintf(savefile, "%d\n", savestate.losses);
+	fprintf(savefile, "%d\n", savestate.winning_streak);
+	fprintf(savefile, "%d\n", savestate.losing_streak);
 
 }
 
