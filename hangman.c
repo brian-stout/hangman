@@ -249,6 +249,7 @@ void result_printer(char *string, int bitmask)
 void get_letter(char *chr)
 {
 	fgets(chr, sizeof(chr), stdin);
+	chr[1] = '\0';
 }
 
 void read_savefile(FILE *savefile, struct savestate *savestate)
