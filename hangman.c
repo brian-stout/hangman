@@ -11,6 +11,7 @@
 	for all the places it was correct.
 
 	If function return a zero, the player had a miss
+	If function returns a full bit mask, the player wins.
 */
 int character_matcher(char *, char);
 
@@ -21,7 +22,7 @@ int character_matcher(char *, char);
 	else it'll print out an underscore unless it's a nonalphabet character
 
 */
-void result_printer(char *string, int bitmask);
+void result_printer(char *, int);
 
 int main(void)
 {
@@ -106,7 +107,7 @@ int character_matcher(char *string, char ch)
 	return;
 }
 
-int result_printer(char *string, int bitmask)
+void result_printer(char *string, int bitmask)
 {
 	return;
 }
