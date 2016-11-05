@@ -182,7 +182,7 @@ int main(void)
 
 		//Reads through each line of a file.
 		//TODO: Can probably be put in a function
-		while ((fgets(word, sizeof(word), dictionary)) != EOF){
+		while ((fgets(word, sizeof(word), dictionary)) != NULL){
 			++line_count;
 			if(line_count == rand_line_number){
 				//Removing the newline from the word
@@ -243,7 +243,7 @@ int main(void)
 			}
 			//Breaks out of a loop if player makes 6 bad guesses, aka a loss
 			if(miss_count == 6){
-				printf("You lose!\n");
+				printf("You lose!  The word was %s\n", word);
 				//Saving the results in the savestate struct
 				++savestate.losses;
 				//Logic determining streaks
@@ -461,7 +461,8 @@ int menu_switch(struct savestate *savestate)
 {
 	char num_switch = '1';
 
-	printf("\nWhat would you like to do?\n1.  Play a game  2.  Show stats  "
+	printf("\nWhat would you like to do?\n"
+			"1.  Play a game  2.  Show stats  "
 			"\n3.  Reset Stats  4.  Quit\n");
 
 	printf("Option: ");
