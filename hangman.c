@@ -380,10 +380,10 @@ void print_stats(struct savestate savestate)
 	int total_games = savestate.losses + savestate.wins;
 	printf("Game %d.   ", total_games);
 	if(savestate.wins > 2){
-		printf("%d wins//", savestate.wins);
+		printf("%d wins/", savestate.wins);
 	}
 	else{
-		printf("%d win//", savestate.wins);
+		printf("%d win/", savestate.wins);
 	}
 	if(savestate.losses > 2){
 		printf("%d losses. ", savestate.losses);
@@ -393,11 +393,11 @@ void print_stats(struct savestate savestate)
 	}
 	
 	//Handles a floating point exception
-	if(total_games > 0){
+	if(savestate.misses > 0){
 		printf("Average score: %d\n", (total_games/savestate.misses));	
 	}
 	else{
-		printf("Welcome to hangman! \n");
+		printf("Average score: %d.0\n", total_games);
 	}	
 }
 
