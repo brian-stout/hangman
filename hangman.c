@@ -46,6 +46,7 @@ void result_printer(char *, int, size_t);
 */
 char get_letter();
 
+
 /** read_savefile function reads the savefile ".hangman" that the
 *		program generates, parses that information and passes it to
 *		the savestate struct which keeps track of all the user stat
@@ -53,12 +54,14 @@ char get_letter();
 */
 void read_savefile(FILE *, struct savestate *);
 
+
 /** write_savefile function takes the savestate struct before the program
 *		terminates and writes it to .hangman in the 
 *
 *
 */
 void write_savefile(FILE *, struct savestate);
+
 
 /** simple function that takes in a pointer to a string and fills it with
 *		null bytes.  The purpose is to wipe buffers at the end of a playthrough
@@ -77,10 +80,15 @@ void wipe_string(char *, size_t);
 */
 void print_stats(struct savestate);
 
-
+/** print_stats function is given the number of guesses and prints out
+*		the correct ascii symbols as a response
+*/
 void print_hangedman(int);
 
 
+/**	menu_switch handles the logic before and after a game starts allowing
+*		the player to reset stats, show stats, and quit the game
+*/
 int menu_switch(struct savestate *);
 
 
@@ -94,7 +102,8 @@ int main(void)
 	char words_directory[32];
 	char hangman_directory[32];
 
-	//Copies home directory path to two  buff arrays to avoid writing over env variables
+	//Copies home directory path to two  buff arrays to avoid writing
+	//over env variables
 	strncpy(hangman_directory, envptr, sizeof(hangman_directory));
 	strncpy(words_directory, envptr, sizeof(words_directory));
 
@@ -124,7 +133,7 @@ int main(void)
 		}
 
 		//Initialized a struct which will keep track of stats
-		//Will be passed to a function later to save the states on round completion
+		//Will be passed to a function later to save the state
 		struct savestate savestate;
 
 		//Initializes savestate struct
