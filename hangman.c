@@ -380,6 +380,7 @@ void print_stats(struct savestate savestate)
 	printf("Average score: %d\n", (total_games/savestate.misses));		
 }
 
+
 void print_hangedman(int miss_count){
 	if(miss_count >= 1){
 		printf("  O\n");
