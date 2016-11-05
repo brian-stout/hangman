@@ -467,7 +467,8 @@ int menu_switch(struct savestate *savestate)
 	printf("Option: ");
 	num_switch = get_letter();
 	printf("\n");
-
+	
+	//Switches cause they're for cool kids
 	switch(num_switch) {
 		case '1' :
 			return 1;
