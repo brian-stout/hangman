@@ -430,7 +430,7 @@ int menu_switch(struct savestate *savestate)
 {
 	char num_switch = '1';
 
-	printf("What would you like to do?\n1.  Play a game  2.  Show stats  "
+	printf("\n\nWhat would you like to do?\n1.  Play a game  2.  Show stats  "
 			"\n3.  Reset Stats  4.  Quit\n\n");
 
 	num_switch = get_letter();
@@ -453,6 +453,9 @@ int menu_switch(struct savestate *savestate)
 			return 0;
 			break;
 		case '4' :
+			return -1;
+			break;
+		case 'q' :
 			return -1;
 			break;
 	}
