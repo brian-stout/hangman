@@ -450,13 +450,16 @@ int menu_switch(struct savestate *savestate)
 			savestate->winning_streak = 0;
 			savestate->losing_streak = 0;
 			savestate->misses = 0;
-			return 0;
+			printf("Resetting your stats!\n");
 			break;
 		case '4' :
 			return -1;
 			break;
 		case 'q' :
 			return -1;
+			break;
+		default :
+			printf("Please enter a valid option!\n");
 			break;
 	}
 	return 0;
