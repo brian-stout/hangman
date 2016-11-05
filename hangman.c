@@ -395,5 +395,4 @@ void print_hangedman(int guess_count){
 	else{
 		printf(" /  \ \n");
 	}
-
 }
