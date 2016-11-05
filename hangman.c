@@ -244,7 +244,6 @@ int main(void)
 			//Breaks out of a loop if player makes 6 bad guesses, aka a loss
 			if(miss_count == 6){
 				printf("You lose!\n");
-			
 				//Saving the results in the savestate struct
 				++savestate.losses;
 				//Logic determining streaks
@@ -267,7 +266,8 @@ int main(void)
 			letter_guess = get_letter();
 			printf("\n");  //New line for formatting
 
-			//Figures out how many characters are in the word and returns the resulting mask
+			//Figures out how many characters are in the word 
+			//and returns the resulting mask
 			result_mask = character_matcher(word, letter_guess, word_len);
 	
 			//Checks for a bad guess
@@ -282,9 +282,11 @@ int main(void)
 			//Or's the current mask so program can keep track of player progress
 			current_mask |= result_mask;
 
-			//Creating a temporary array for word so function doesn't modify the original word
+			//Copying the word into a temp_word because result_printer
+			//modifies the array that's passed to it
 			strncpy(temp_word, word, word_len);
 
+			//Prints out the string the user will see and use to play
 			result_printer(temp_word, current_mask, word_len);
 			printf("%d: %s\n", miss_count, temp_word);
 
@@ -297,6 +299,7 @@ int main(void)
 		current_mask = 0;
 		word_len = 0;
 
+		//Open the file back up so we can save the results of the round
 		save_file = fopen(hangman_directory, "w");
 			if(!save_file){
 				perror("Can not open .hangman to write to!");
@@ -311,7 +314,9 @@ int main(void)
 int character_matcher(char string[], char chr, size_t word_len)
 {
 	unsigned int mask = 0;
+	//initializes alt_char to avoid conditional with unitialized value
 	char alt_chr = '\0';
+	//Logic to make program case insensitive
 	if(isupper(chr)){
 		alt_chr = tolower(chr);
 	}
@@ -319,11 +324,13 @@ int character_matcher(char string[], char chr, size_t word_len)
 		alt_chr = toupper(chr);
 	}
 	for(size_t i = 0; i < word_len; ++i){
+		//If char matches or is punctuation set bit to 1
 		if(string[i] == chr || string[i] == alt_chr || isalpha(string[i]) == 0){
 			mask |= 1;
 		} 
 			mask <<= 1;
 	}
+	//Handles the null byte
 	mask >>= 1;
 	return mask;
 }
@@ -334,8 +341,10 @@ void result_printer(char *string, int bitmask, size_t word_len)
 	//Starting at end to match the bitmask
 	for(int i = word_len - 1; i >= 0; --i){
 		if((bitmask & 1) != 1){
+			//If bit set to 0 then it'll display a _
 			string[i] = '_';
 		}
+		//Shift right to go back through the bits
 		bitmask >>= 1;
 	}
 }
@@ -367,7 +376,6 @@ void read_savefile(FILE *savefile, struct savestate *savestate)
 
 		fgets(savebuf, sizeof(savebuf), savefile);
 		savestate->misses = strtol(savebuf, NULL, 10);
-
 }
 
 
@@ -392,13 +400,19 @@ void print_stats(struct savestate savestate)
 {
 	//Variable calculated to increase readability
 	int total_games = savestate.losses + savestate.wins;
+
+	//Entire thing will look like this
+	//Game 8.   1 win/7 losses. Average score: 0
+
 	printf("Game %d.   ", total_games);
+	//Handles grammar for wins
 	if(savestate.wins > 1){
 		printf("%d wins/", savestate.wins);
 	}
 	else{
 		printf("%d win/", savestate.wins);
 	}
+	//Handles grammar for losses
 	if(savestate.losses == 1){
 		printf("%d loss. ", savestate.losses);
 	}
@@ -406,10 +420,10 @@ void print_stats(struct savestate savestate)
 		printf("%d losses. ", savestate.losses);
 	}
 	
-	//Handles a floating point exception
 	if(total_games == 0){
 		printf("Welcome to hangman!\n");
 	}
+	//Handles a floating point exception
 	else if(savestate.misses > 0){
 		printf("Average score: %d\n", (total_games/savestate.misses));	
 	}
@@ -473,9 +487,11 @@ int menu_switch(struct savestate *savestate)
 		case '4' :
 			return -1;
 			break;
+		//Because it's reflex
 		case 'q' :
 			return -1;
 			break;
+		//Default for bad input
 		default :
 			printf("Please enter a valid option!\n");
 			break;
