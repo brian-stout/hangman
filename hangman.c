@@ -123,20 +123,15 @@ int main(void)
 			}
 		}
 
-		//Initialized a struct that will keep track of stats
+		//Initialized a struct which will keep track of stats
 		//Will be passed to a function later to save the states on round completion
 		struct savestate savestate;
+
+		//Initializes savestate struct
 		read_savefile(save_file, &savestate);
 
-		while(true){
-			int menu_flag = menu_switch(&savestate);
-			if(menu_flag == 1){
-				break;
-			}
-			else if(menu_flag == -1){
-				return 0;
-			}
-		}
+		//We're finished with the save_file for now
+		fclose(save_file);
 
 		//Opens up the dictionary in the directory, errors out if it's not there
 		FILE *dictionary = fopen(words_directory, "r");
@@ -187,11 +182,21 @@ int main(void)
 			}
 		}
 
+		//Done with the dictionary
+		fclose(dictionary);
+
+		while(true){
+			int menu_flag = menu_switch(&savestate);
+			if(menu_flag == 1){
+				break;
+			}
+			else if(menu_flag == -1){
+				return 0;
+			}
+		}
+
 		//Calculate strlen here because it's used a million times in this function
 		size_t word_len = strlen(word);
-		printf("DEBUG: %s\n", word);
-
-		char letter_guess;
 
 		//Generates a number that is used to compare to a full mask aka a win
 		unsigned int win_mask = 1;
@@ -205,10 +210,11 @@ int main(void)
 		//Intializes values to be used in the loop later
 		unsigned int current_mask = 0;
 		unsigned int result_mask;
+		int miss_count = 0;
+		char letter_guess;
 
 		//Using a buffer to avoid modifying word directly
 		char temp_word[64] = "\0"; //initialized default values because valgrind
-		int miss_count = 0;
 
 		while(true){
 
@@ -229,12 +235,16 @@ int main(void)
 			//Breaks out of a loop if player makes 6 bad guesses, aka a loss
 			if(miss_count == 6){
 				printf("You lose!\n");
+			
+				//Saving the results in the savestate struct
 				++savestate.losses;
+				//Logic determining streaks
 				++savestate.losing_streak;
 				if(savestate.losing_streak > 1){
 					printf("You are on a %d game losing streak!\n"
 							" ", savestate.losing_streak);
 				}
+				//Sets winning streak to 0 on loss
 				if(savestate.winning_streak > 0){
 					savestate.winning_streak = 0;
 				}
@@ -243,12 +253,10 @@ int main(void)
 
 			print_stats(savestate);			
 
-			//Gets character
+			//Getting the charactere here
 			printf("Guess a letter: ");
 			letter_guess = get_letter();
-			printf("\n");
-
-			//Captures a result mask and ors it with the current mask
+			printf("\n");  //New line for formatting
 
 			//Figures out how many characters are in the word and returns the resulting mask
 			result_mask = character_matcher(word, letter_guess, word_len);
@@ -271,24 +279,20 @@ int main(void)
 			result_printer(temp_word, current_mask, word_len);
 			printf("%d: %s\n", miss_count, temp_word);
 
+			//Wipe temp_word for program stability
 			wipe_string(temp_word, word_len);
 		}
 
 		//Wipes out buffers and masks to make rerunning the program more stable
-		result_mask = 0;
 		win_mask = 0;
 		current_mask = 0;
 		word_len = 0;
-
-		fclose(dictionary);
-		fclose(save_file);
 
 		save_file = fopen(hangman_directory, "w");
 			if(!save_file){
 				perror("Can not open .hangman to write to!");
 				return EX_NOINPUT;
 			}
-
 		write_savefile(save_file, savestate);
 		fclose(save_file);
 	}
@@ -394,7 +398,10 @@ void print_stats(struct savestate savestate)
 	}
 	
 	//Handles a floating point exception
-	if(savestate.misses > 0){
+	if(total_games == 0){
+		printf("Welcome to hangman!\n");
+	}
+	else if(savestate.misses > 0){
 		printf("Average score: %d\n", (total_games/savestate.misses));	
 	}
 	else{
@@ -444,7 +451,6 @@ int menu_switch(struct savestate *savestate)
 			break;
 		case '2' :
 			print_stats(*savestate);
-			printf("\n");
 			return 0;
 			break;
 		case '3' :
