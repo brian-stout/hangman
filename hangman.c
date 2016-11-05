@@ -78,6 +78,9 @@ void wipe_string(char *, size_t);
 void print_stats(struct savestate);
 
 
+void print_hangedman(int);
+
+
 int main(void)
 {
 	//Gets a path to the users home directory
@@ -192,7 +195,7 @@ int main(void)
 
 		//Using a buffer to avoid modifying word directly
 		char temp_word[64] = "\0"; //initialized default values because valgrind
-		int guess_count = 0;
+		int miss_count = 0;
 
 		while(true){
 
@@ -211,7 +214,7 @@ int main(void)
 				break;
 			}
 			//Breaks out of a loop if player makes 6 bad guesses, aka a loss
-			if(guess_count == 6){
+			if(miss_count == 6){
 				printf("You lose!\n");
 				++savestate.losses;
 				++savestate.losing_streak;
@@ -239,9 +242,11 @@ int main(void)
 			//Checks for a bad guess
 			if(result_mask == miss_mask){
 				printf("Bad guess!\n");
-				++guess_count;
+				++miss_count;
 				++savestate.misses;
 			}
+
+			print_hangedman(miss_count);
 
 			//Or's the current mask so program can keep track of player progress
 			current_mask |= result_mask;
@@ -375,24 +380,24 @@ void print_stats(struct savestate savestate)
 	printf("Average score: %d\n", (total_games/savestate.misses));		
 }
 
-void print_hangedman(int guess_count){
-	if(guess_count > 0){
+void print_hangedman(int miss_count){
+	if(miss_count == 1){
 		printf("  O  \n");
 	}
-	if(guess_count == 1 ){
+	if(miss_count == 2 ){
 		printf("  | \n"); 
 	}
-	else if(guess_count = 2)
+	else if(miss_count == 3)
 	{
-		printf("/ O  \n");
+		printf("/   \n");
 	}
-	else (guess_count = 3){
-		printf(" / O \ \n");
+	else if(miss_count == 4){
+		printf(" /  \\ \n");
 	}
-	if(guess_count = 4){
+	if(miss_count == 5){
 		printf("  /   \n"); 
 	}
-	else{
-		printf(" /  \ \n");
+	else if(miss_count == 6){
+		printf(" /  \\ \n");
 	}
 }
