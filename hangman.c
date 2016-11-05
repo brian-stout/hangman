@@ -243,7 +243,7 @@ int main(void)
 			}
 			//Breaks out of a loop if player makes 6 bad guesses, aka a loss
 			if(miss_count == 6){
-				printf("You lose!  The word was %s\n", word);
+				printf("You lose!  The word was %s\n.", word);
 				//Saving the results in the savestate struct
 				++savestate.losses;
 				//Logic determining streaks
