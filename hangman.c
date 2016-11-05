@@ -26,7 +26,7 @@ struct savestate{
 *		for all the places it was correct.
 *
 *		If function return a zero, the player had a miss
-*		If function returns a full bit mask, the player wins.
+*		If function returns a full bit mask, the player wins
 */
 int character_matcher(char *, char, size_t);
 
@@ -159,7 +159,7 @@ int main(void)
 				++line_count;
 			}
 		}
-	
+
 		//Closes and reopens the file so it can be read again
 		fclose(dictionary);
 		dictionary = fopen(words_directory, "r");
@@ -168,7 +168,7 @@ int main(void)
 		srand(time(NULL));
 		int rand_line_number;
 
-		//Determines which line will be pulled out from the file.
+		//Determines which line will be pulled out from the file
 		//The +1 includes the final number
 		//TODO: Can be put in function.. maybe unnesscary?
 		rand_line_number = rand() % line_count + 1;
@@ -180,7 +180,7 @@ int main(void)
 		char word[32] = "\0"; //Initialized default value because valgrind errors
 		wipe_string(word, strlen(word));
 
-		//Reads through each line of a file.
+		//Reads through each line of a file
 		//TODO: Can probably be put in a function
 		while ((fgets(word, sizeof(word), dictionary)) != NULL){
 			++line_count;
@@ -212,7 +212,7 @@ int main(void)
 		win_mask <<= word_len;
 		win_mask -= 1;
 
-		//Defines what a miss is.
+		//Defines what a miss is
 		//An empty character_matcher result plus punctuation
 		unsigned int miss_mask = character_matcher(word, '\0', word_len);
 
@@ -266,7 +266,7 @@ int main(void)
 			letter_guess = get_letter();
 			printf("\n");  //New line for formatting
 
-			//Figures out how many characters are in the word 
+			//Figures out how many characters are in the word
 			//and returns the resulting mask
 			result_mask = character_matcher(word, letter_guess, word_len);
 
@@ -327,7 +327,7 @@ int character_matcher(char string[], char chr, size_t word_len)
 		//If char matches or is punctuation set bit to 1
 		if(string[i] == chr || string[i] == alt_chr || isalpha(string[i]) == 0){
 			mask |= 1;
-		} 
+		}
 			mask <<= 1;
 	}
 	//Handles the null byte
@@ -470,7 +470,7 @@ int menu_switch(struct savestate *savestate)
 	printf("\n");
 
 	//Switches cause they're for cool kids
-	switch(num_switch) {
+	switch(num_switch){
 		case '1' :
 			return 1;
 			break;
