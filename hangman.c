@@ -129,7 +129,13 @@ int main(void)
 		read_savefile(save_file, &savestate);
 
 		while(true){
-			if menu_switch(&savestate);
+			int menu_flag = menu_switch(&savestate);
+			if(menu_flag == 1){
+				break;
+			}
+			else if(menu_flag == -1){
+				return 0;
+			}
 		}
 
 		//Opens up the dictionary in the directory, errors out if it's not there
@@ -385,7 +391,14 @@ void print_stats(struct savestate savestate)
 	else{
 		printf("%d loss. ", savestate.losses);
 	}
-	printf("Average score: %d\n", (total_games/savestate.misses));		
+	
+	//Handles a floating point exception
+	if(total_games > 0){
+		printf("Average score: %d\n", (total_games/savestate.misses));	
+	}
+	else{
+		printf("Welcome to hangman! \n");
+	}	
 }
 
 
@@ -427,7 +440,8 @@ int menu_switch(struct savestate *savestate)
 			return 1;
 			break;
 		case '2' :
-			print_stats(*savetate);
+			print_stats(*savestate);
+			printf("\n");
 			return 0;
 			break;
 		case '3' :
@@ -438,7 +452,9 @@ int menu_switch(struct savestate *savestate)
 			savestate->misses = 0;
 			return 0;
 			break;
-		case '4';
+		case '4' :
 			return -1;
 			break;
+	}
+	return 0;
 }
