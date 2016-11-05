@@ -246,6 +246,7 @@ int main(void)
 			//Gets character
 			printf("Guess a letter: ");
 			letter_guess = get_letter();
+			printf("\n");
 
 			//Captures a result mask and ors it with the current mask
 
@@ -268,7 +269,7 @@ int main(void)
 			strncpy(temp_word, word, word_len);
 
 			result_printer(temp_word, current_mask, word_len);
-			printf("%s\n", temp_word);
+			printf("%d: %s\n", miss_count, temp_word);
 
 			wipe_string(temp_word, word_len);
 		}
@@ -385,11 +386,11 @@ void print_stats(struct savestate savestate)
 	else{
 		printf("%d win/", savestate.wins);
 	}
-	if(savestate.losses > 1){
-		printf("%d losses. ", savestate.losses);
+	if(savestate.losses == 1){
+		printf("%d loss. ", savestate.losses);
 	}
 	else{
-		printf("%d loss. ", savestate.losses);
+		printf("%d losses. ", savestate.losses);
 	}
 	
 	//Handles a floating point exception
@@ -430,10 +431,12 @@ int menu_switch(struct savestate *savestate)
 {
 	char num_switch = '1';
 
-	printf("\n\nWhat would you like to do?\n1.  Play a game  2.  Show stats  "
-			"\n3.  Reset Stats  4.  Quit\n\n");
+	printf("\nWhat would you like to do?\n1.  Play a game  2.  Show stats  "
+			"\n3.  Reset Stats  4.  Quit\n");
 
+	printf("Option: ");
 	num_switch = get_letter();
+	printf("\n");
 
 	switch(num_switch) {
 		case '1' :
