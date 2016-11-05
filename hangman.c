@@ -379,13 +379,13 @@ void print_stats(struct savestate savestate)
 	//Variable calculated to increase readability
 	int total_games = savestate.losses + savestate.wins;
 	printf("Game %d.   ", total_games);
-	if(savestate.wins > 2){
+	if(savestate.wins > 1){
 		printf("%d wins/", savestate.wins);
 	}
 	else{
 		printf("%d win/", savestate.wins);
 	}
-	if(savestate.losses > 2){
+	if(savestate.losses > 1){
 		printf("%d losses. ", savestate.losses);
 	}
 	else{
