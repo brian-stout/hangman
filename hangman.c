@@ -81,6 +81,9 @@ void print_stats(struct savestate);
 void print_hangedman(int);
 
 
+int menu_switch(struct savestate *);
+
+
 int main(void)
 {
 	//Gets a path to the users home directory
@@ -124,6 +127,10 @@ int main(void)
 		//Will be passed to a function later to save the states on round completion
 		struct savestate savestate;
 		read_savefile(save_file, &savestate);
+
+		while(true){
+			if menu_switch(&savestate);
+		}
 
 		//Opens up the dictionary in the directory, errors out if it's not there
 		FILE *dictionary = fopen(words_directory, "r");
@@ -360,6 +367,7 @@ void wipe_string(char *string, size_t word_len){
 	}
 }
 
+
 void print_stats(struct savestate savestate)
 {
 	//Variable calculated to increase readability
@@ -381,7 +389,8 @@ void print_stats(struct savestate savestate)
 }
 
 
-void print_hangedman(int miss_count){
+void print_hangedman(int miss_count)
+{
 	if(miss_count >= 1){
 		printf("  O\n");
 	}
@@ -401,4 +410,35 @@ void print_hangedman(int miss_count){
 	else if(miss_count == 6){
 		printf(" / \\\n");
 	}
+}
+
+
+int menu_switch(struct savestate *savestate)
+{
+	char num_switch = '1';
+
+	printf("What would you like to do?\n1.  Play a game  2.  Show stats  "
+			"\n3.  Reset Stats  4.  Quit\n\n");
+
+	num_switch = get_letter();
+
+	switch(num_switch) {
+		case '1' :
+			return 1;
+			break;
+		case '2' :
+			print_stats(*savetate);
+			return 0;
+			break;
+		case '3' :
+			savestate->wins = 0;
+			savestate->losses = 0;
+			savestate->winning_streak = 0;
+			savestate->losing_streak = 0;
+			savestate->misses = 0;
+			return 0;
+			break;
+		case '4';
+			return -1;
+			break;
 }
