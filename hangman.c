@@ -36,7 +36,7 @@ int character_matcher(char *, char, size_t);
 *		if the bit in the mask is set to 1, will print out that character,
 *		else it'll print out an underscore unless it's a nonalphabet character
 *
-*		TODO: Write logic to test for unicode and handle it properly
+*
 */
 void result_printer(char *, int, size_t);
 
@@ -124,7 +124,7 @@ int main(void)
 			fprintf(save_file, "0\n0\n0\n0\n0\n");
 	
 			fclose(save_file);
-	
+
 			save_file = fopen(hangman_directory, "r");
 			if(!save_file){
 				perror("Can not open the .hangman file!");
@@ -148,7 +148,7 @@ int main(void)
 			perror("Could not open .words file");
 			return EX_NOINPUT;
 		}
-	
+
 		int line_count = 0;
 		int ch;
 
@@ -163,7 +163,7 @@ int main(void)
 		//Closes and reopens the file so it can be read again
 		fclose(dictionary);
 		dictionary = fopen(words_directory, "r");
-	
+
 		//Sets the seed for the random number generator
 		srand(time(NULL));
 		int rand_line_number;
@@ -215,7 +215,7 @@ int main(void)
 		//Defines what a miss is.
 		//An empty character_matcher result plus punctuation
 		unsigned int miss_mask = character_matcher(word, '\0', word_len);
-	
+
 		//Intializes values to be used in the loop later
 		unsigned int current_mask = 0;
 		unsigned int result_mask;
@@ -259,7 +259,7 @@ int main(void)
 				break;
 			}
 
-			print_stats(savestate);			
+			print_stats(savestate);
 
 			//Getting the charactere here
 			printf("Guess a letter: ");
@@ -269,7 +269,7 @@ int main(void)
 			//Figures out how many characters are in the word 
 			//and returns the resulting mask
 			result_mask = character_matcher(word, letter_guess, word_len);
-	
+
 			//Checks for a bad guess
 			if(result_mask == miss_mask){
 				printf("Bad guess!\n");
@@ -419,7 +419,7 @@ void print_stats(struct savestate savestate)
 	else{
 		printf("%d losses. ", savestate.losses);
 	}
-	
+
 	if(total_games == 0){
 		printf("Welcome to hangman!\n");
 	}
@@ -429,7 +429,7 @@ void print_stats(struct savestate savestate)
 	}
 	else{
 		printf("Average score: %d.0\n", total_games);
-	}	
+	}
 }
 
 
@@ -468,7 +468,7 @@ int menu_switch(struct savestate *savestate)
 	printf("Option: ");
 	num_switch = get_letter();
 	printf("\n");
-	
+
 	//Switches cause they're for cool kids
 	switch(num_switch) {
 		case '1' :
