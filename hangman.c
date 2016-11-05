@@ -194,6 +194,10 @@ int main(void)
 				printf("You win!\n");
 				++savestate.wins;
 				++savestate.winning_streak;
+				if(savestate.winning_streak > 1){
+					printf("You are on a %d game winning streak!\n"
+							" ", savestate.winning_streak);
+				}
 				if(savestate.losing_streak > 0){
 					savestate.losing_streak = 0;
 				}
@@ -204,6 +208,10 @@ int main(void)
 				printf("You lose!\n");
 				++savestate.losses;
 				++savestate.losing_streak;
+				if(savestate.losing_streak > 1){
+					printf("You are on a %d game losing streak!\n"
+							" ", savestate.losing_streak);
+				}
 				if(savestate.winning_streak > 0){
 					savestate.winning_streak = 0;
 				}
@@ -345,7 +353,7 @@ void print_stats(struct savestate savestate)
 {
 	//Variable calculated to increase readability
 	int total_games = savestate.losses + savestate.wins;
-	printf("Game %d. ", total_games);
+	printf("Game %d.   ", total_games);
 	if(savestate.wins > 2){
 		printf("%d wins//", savestate.wins);
 	}
