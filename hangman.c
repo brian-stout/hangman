@@ -68,6 +68,8 @@ void write_savefile(FILE *, struct savestate);
 */
 void wipe_string(char *, size_t);
 
+void print_stats(struct savestate);
+
 
 int main(void)
 {
@@ -207,30 +209,9 @@ int main(void)
 				}
 				break;
 			}
-			char win_grammar = 's';
-			char loss_grammar[8] = "es";
 
-			if(savestate.wins < 2){
-				win_grammar = '\0';
-			}
-			else{
-				win_grammar = 's';
-			}
-			printf("Game %d. %d win%s//%d loss%s. Average score: %d\n",,
-			printf("Game %d. ", savestate.losses + savestate.wins);
-			if(savestate.wins > 2){
-				printf("%d wins//", savestate.wins);
-			}
-			else{
-				printf("%d win//", savestate.wins);
-			}
-			if(savestate.losses > 2){
-				printf("%d losses", savestate.losses);
-			}
-			else{
-				printf("%d loss", savestate.losses);
-			}			
-			
+			print_stats(savestate);			
+
 			//Gets character
 			printf("Guess a letter: ");
 			letter_guess = get_letter();
@@ -358,4 +339,24 @@ void wipe_string(char *string, size_t word_len){
 	for(size_t i = 0; i < word_len; ++i){
 		string[i] = '\0';
 	}
+}
+
+void print_stats(struct savestate savestate)
+{
+	//Variable calculated to increase readability
+	int total_games = savestate.losses + savestate.wins;
+	printf("Game %d. ", total_games);
+	if(savestate.wins > 2){
+		printf("%d wins//", savestate.wins);
+	}
+	else{
+		printf("%d win//", savestate.wins);
+	}
+	if(savestate.losses > 2){
+		printf("%d losses. ", savestate.losses);
+	}
+	else{
+		printf("%d loss. ", savestate.losses);
+	}
+	printf("Average score: %d\n", (total_games/savestate.misses));		
 }
