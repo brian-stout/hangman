@@ -68,7 +68,16 @@ void write_savefile(FILE *, struct savestate);
 */
 void wipe_string(char *, size_t);
 
+
+/**	print_stats function prints the first line before the guess.
+*		It's entire purpose is to condense a bunch of logic to
+*		make the main program less noisy.
+*
+*		Handles grammar as well.
+*/
 void print_stats(struct savestate);
+
+int win_check(int, int, struct savestate *);
 
 
 int main(void)
@@ -339,7 +348,6 @@ void write_savefile(FILE *savefile, struct savestate savestate)
 	fprintf(savefile, "%d\n", savestate.winning_streak);
 	fprintf(savefile, "%d\n", savestate.losing_streak);
 	fprintf(savefile, "%d\n", savestate.misses);
-
 }
 
 
@@ -367,4 +375,21 @@ void print_stats(struct savestate savestate)
 		printf("%d loss. ", savestate.losses);
 	}
 	printf("Average score: %d\n", (total_games/savestate.misses));		
+}
+
+int win_check(int current_mask, int win_mask, struct savestate *savestate)
+{
+	if(current_mask == win_mask){
+		printf("You win!\n");
+		++savestate.wins;
+		++savestate.winning_streak;
+		if(savestate.winning_streak > 1){
+			printf("You are on a %d game winning streak!\n"
+					" ", savestate.winning_streak);
+		}
+		if(savestate.losing_streak > 0){
+			savestate.losing_streak = 0;
+		}
+		return true;
+	}
 }
