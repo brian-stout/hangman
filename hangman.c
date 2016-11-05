@@ -382,22 +382,22 @@ void print_stats(struct savestate savestate)
 
 void print_hangedman(int miss_count){
 	if(miss_count >= 1){
-		printf("  O  \n");
+		printf("  O\n");
 	}
 	if(miss_count == 2 ){
-		printf("  | \n"); 
+		printf("  |\n"); 
 	}
-	else if(miss_count > 2)
+	else if(miss_count == 3)
 	{
-		printf("/ |  \n");
+		printf(" /|\n");
 	}
 	else if(miss_count > 3){
-		printf(" /  | \\ \n");
+		printf(" /|\\ \n");
 	}
 	if(miss_count == 5){
-		printf("  /   \n"); 
+		printf(" /\n"); 
 	}
 	else if(miss_count == 6){
-		printf(" / \\ \n");
+		printf(" / \\\n");
 	}
 }
