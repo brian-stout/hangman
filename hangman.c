@@ -77,8 +77,6 @@ void wipe_string(char *, size_t);
 */
 void print_stats(struct savestate);
 
-int win_check(int, int, struct savestate *);
-
 
 int main(void)
 {
@@ -199,10 +197,19 @@ int main(void)
 		while(true){
 
 			//Breaks out of loop if player wins
-			if(win_check(current_mask, win_mask, &savestate)){
+			if(current_mask == win_mask){
+				printf("You win!\n");
+				++savestate.wins;
+				++savestate.winning_streak;
+				if(savestate.winning_streak > 1){
+					printf("You are on a %d game winning streak!\n"
+							" ", savestate.winning_streak);
+				}
+				if(savestate.losing_streak > 0){
+					savestate.losing_streak = 0;
+				}
 				break;
 			}
-
 			//Breaks out of a loop if player makes 6 bad guesses, aka a loss
 			if(guess_count == 6){
 				printf("You lose!\n");
@@ -368,19 +375,25 @@ void print_stats(struct savestate savestate)
 	printf("Average score: %d\n", (total_games/savestate.misses));		
 }
 
-int win_check(int current_mask, int win_mask, struct savestate *savestate)
-{
-	if(current_mask == win_mask){
-		printf("You win!\n");
-		++savestate.wins;
-		++savestate.winning_streak;
-		if(savestate.winning_streak > 1){
-			printf("You are on a %d game winning streak!\n"
-					" ", savestate.winning_streak);
-		}
-		if(savestate.losing_streak > 0){
-			savestate.losing_streak = 0;
-		}
-		return true;
+void print_hangedman(int guess_count){
+	if(guess_count > 0){
+		printf("  O  \n");
 	}
+	if(guess_count == 1 ){
+		printf("  | \n"); 
+	}
+	else if(guess_count = 2)
+	{
+		printf("/ O  \n");
+	}
+	else (guess_count = 3){
+		printf(" / O \ \n");
+	}
+	if(guess_count = 4){
+		printf("  /   \n"); 
+	}
+	else{
+		printf(" /  \ \n");
+	}
+
 }
